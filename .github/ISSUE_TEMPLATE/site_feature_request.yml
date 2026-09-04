@@ -1,0 +1,27 @@
+name: Site Support / Feature Request
+description: Request support for a new site or platform in Py-dlp
+labels: [site-request]
+body:
+  - type: input
+    id: site_name
+    attributes:
+      label: Platform / Site Name
+      placeholder: "e.g., CoolStreaming"
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample_urls
+    attributes:
+      label: Example URLs
+      description: Provide example URLs to media on the site
+      placeholder: |
+        https://example.com/watch/123
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Additional Information
+      description: Any notes about login, DRM, streaming formats (HLS/DASH/MP4).

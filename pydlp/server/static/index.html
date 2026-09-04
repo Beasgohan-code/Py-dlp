@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Py-dlp — Ultimate Media Extractor & Downloader</title>
+  <title>Py-dlp Studio — Next-Gen Media Extractor & Downloader</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --bg-card: rgba(18, 24, 38, 0.7);
-      --bg-card-hover: rgba(28, 36, 56, 0.85);
+      --bg: #07090e;
+      --bg-surface: #0e131f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(28, 38, 58, 0.9);
       --border: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(99, 102, 241, 0.4);
+      --border-accent: rgba(99, 102, 241, 0.45);
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
@@ -24,7 +25,7 @@
       --warning: #f59e0b;
       --danger: #ef4444;
       --card-radius: 16px;
-      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.6);
     }
 
     * {
@@ -36,9 +37,9 @@
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.05) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
       color: var(--text);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -47,16 +48,16 @@
     }
 
     header {
-      padding: 24px 32px;
+      padding: 18px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 50;
-      background: rgba(9, 13, 22, 0.8);
+      background: rgba(7, 9, 14, 0.85);
     }
 
     .logo-container {
@@ -68,16 +69,16 @@
     }
 
     .logo-icon {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
       background: var(--primary-gradient);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 20px;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.45);
     }
 
     .logo-text {
@@ -96,17 +97,18 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 999px;
       background: rgba(99, 102, 241, 0.15);
       border: 1px solid var(--border-accent);
       color: #818cf8;
+      letter-spacing: 0.5px;
     }
 
     .header-links {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .btn-secondary {
@@ -135,24 +137,24 @@
       max-width: 1200px;
       width: 100%;
       margin: 0 auto;
-      padding: 40px 24px 80px;
+      padding: 36px 24px 80px;
       display: flex;
       flex-direction: column;
-      gap: 40px;
+      gap: 32px;
     }
 
     .hero-section {
       text-align: center;
-      max-width: 760px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
     .hero-title {
-      font-size: 42px;
+      font-size: 44px;
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1.18;
       letter-spacing: -1px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .hero-title span {
@@ -167,13 +169,41 @@
       line-height: 1.6;
     }
 
+    /* Mode Switcher */
+    .mode-switch {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin: 0 auto 16px;
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+    }
+
     .url-input-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--card-radius);
       padding: 12px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       display: flex;
       gap: 12px;
       transition: all 0.3s ease;
@@ -181,7 +211,7 @@
 
     .url-input-card:focus-within {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), var(--shadow);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), var(--shadow);
     }
 
     .url-input {
@@ -199,6 +229,19 @@
       color: var(--text-dim);
     }
 
+    .batch-input {
+      width: 100%;
+      min-height: 120px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 14px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      resize: vertical;
+    }
+
     .btn-primary {
       background: var(--primary-gradient);
       border: none;
@@ -208,54 +251,24 @@
       padding: 12px 28px;
       border-radius: 12px;
       cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
+      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
     }
 
     .btn-primary:hover {
-      opacity: 0.95;
+      opacity: 0.92;
       transform: translateY(-1px);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
     }
 
     .btn-primary:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
-    }
-
-    /* Tabs */
-    .tabs-nav {
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 15px;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background: rgba(99, 102, 241, 0.15);
-      color: #818cf8;
-    }
-
-    .tab-btn:hover:not(.active) {
-      color: var(--text);
+      box-shadow: none;
     }
 
     /* Result preview card */
@@ -264,37 +277,43 @@
       border: 1px solid var(--border);
       border-radius: var(--card-radius);
       padding: 24px;
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 24px;
-      animation: fadeIn 0.3s ease;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    .media-thumb-box {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 16/9;
+      background: rgba(0,0,0,0.4);
     }
 
     .media-thumb {
       width: 100%;
-      aspect-ratio: 16/9;
+      height: 100%;
       object-fit: cover;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid var(--border);
     }
 
     .media-details {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .media-title {
       font-size: 20px;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
     .media-meta {
@@ -311,6 +330,53 @@
       gap: 6px;
     }
 
+    /* Advanced controls row */
+    .feature-toggles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .toggle-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-label input {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .trim-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .trim-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      width: 75px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
     .action-row {
       margin-top: auto;
       display: flex;
@@ -320,18 +386,49 @@
     }
 
     .select-format {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 10px 16px;
+      padding: 11px 16px;
       border-radius: 10px;
       font-size: 14px;
       outline: none;
       cursor: pointer;
+      font-family: inherit;
+      min-width: 220px;
     }
 
     .select-format option {
       background: #111827;
+      color: var(--text);
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+    }
+
+    .tab-btn:hover:not(.active) {
       color: var(--text);
     }
 
@@ -351,6 +448,11 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .task-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .task-header {
@@ -421,7 +523,7 @@
     /* Platforms grid */
     .platforms-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       gap: 16px;
     }
 
@@ -429,7 +531,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px;
+      padding: 18px 14px;
       text-align: center;
       transition: all 0.2s;
     }
@@ -441,15 +543,15 @@
     }
 
     .platform-name {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       margin-top: 6px;
     }
 
     .platform-desc {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-dim);
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     /* Empty state */
@@ -471,7 +573,7 @@
       text-align: center;
       color: var(--text-dim);
       font-size: 13px;
-      background: rgba(9, 13, 22, 0.6);
+      background: rgba(7, 9, 14, 0.7);
     }
 
     @media (max-width: 768px) {
@@ -492,7 +594,7 @@
   <header>
     <a href="#" class="logo-container">
       <div class="logo-icon">⚡</div>
-      <div class="logo-text">Py-<span>dlp</span></div>
+      <div class="logo-text">Py-<span>dlp</span> Studio</div>
       <span class="badge">v2026.09.04</span>
     </a>
     <div class="header-links">
@@ -505,22 +607,38 @@
 
   <main>
     <section class="hero-section">
-      <h1 class="hero-title">Extract & Download Media from <span>Anywhere</span></h1>
-      <p class="hero-desc">The high-performance, modular Python media extraction engine with multi-threaded chunking, HLS/DASH streaming, and format multiplexing.</p>
+      <div class="mode-switch">
+        <button class="mode-btn active" id="singleModeBtn" onclick="setMode('single')">Single Media</button>
+        <button class="mode-btn" id="batchModeBtn" onclick="setMode('batch')">Batch Downloader</button>
+      </div>
+      <h1 class="hero-title">Extract & Download Media from <span>Any Platform</span></h1>
+      <p class="hero-desc">Built-in Turbo multi-connection acceleration, SponsorBlock ad-removal, smart AI chaptering, and format multiplexing.</p>
     </section>
 
-    <div class="url-input-card">
-      <input type="text" id="urlInput" class="url-input" placeholder="Paste URL from YouTube, TikTok, Twitter/X, Instagram, Vimeo, Reddit, SoundCloud...">
+    <!-- Single Mode Card -->
+    <div id="singleCard" class="url-input-card">
+      <input type="text" id="urlInput" class="url-input" placeholder="Paste URL from YouTube, TikTok, Instagram, Twitter/X, Vimeo, Reddit, SoundCloud...">
       <button id="extractBtn" class="btn-primary" onclick="extractUrl()">
-        <span>Extract Info</span>
+        <span>Analyze Media</span>
       </button>
+    </div>
+
+    <!-- Batch Mode Card -->
+    <div id="batchCard" class="url-input-card" style="display: none; flex-direction: column;">
+      <textarea id="batchInput" class="batch-input" placeholder="Enter multiple URLs (one per line)..."></textarea>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 13px; color: var(--text-dim);">Paste up to 50 URLs at once</span>
+        <button id="batchBtn" class="btn-primary" onclick="startBatchDownload()">
+          <span>⬇️ Download All</span>
+        </button>
+      </div>
     </div>
 
     <div id="mediaResult" style="display: none;"></div>
 
     <div class="tabs-nav">
       <button class="tab-btn active" onclick="switchTab('tasks')">Active Downloads (<span id="taskCount">0</span>)</button>
-      <button class="tab-btn" onclick="switchTab('platforms')">Supported Extractors</button>
+      <button class="tab-btn" onclick="switchTab('platforms')">Supported Extractors (<span id="extractorCount">24+</span>)</button>
     </div>
 
     <div id="tasksTab">
@@ -534,18 +652,27 @@
 
     <div id="platformsTab" style="display: none;">
       <div class="platforms-grid" id="platformsGrid">
-        <!-- Filled by JS -->
+        <!-- Filled dynamically -->
       </div>
     </div>
   </main>
 
   <footer>
-    Py-dlp &copy; 2026 — Next-Gen Extractor & Downloader Suite. Built with pure Python.
+    Py-dlp &copy; 2026 — Next-Gen Extractor & Downloader Suite. Engineered in Pure Python.
   </footer>
 
   <script>
     let currentMediaInfo = null;
     let tasks = [];
+    let currentMode = 'single';
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('singleModeBtn').classList.toggle('active', mode === 'single');
+      document.getElementById('batchModeBtn').classList.toggle('active', mode === 'batch');
+      document.getElementById('singleCard').style.display = mode === 'single' ? 'flex' : 'none';
+      document.getElementById('batchCard').style.display = mode === 'batch' ? 'flex' : 'none';
+    }
 
     async function extractUrl() {
       const url = document.getElementById('urlInput').value.trim();
@@ -573,7 +700,7 @@
         alert('Network error: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = 'Extract Info';
+        btn.innerHTML = 'Analyze Media';
       }
     }
 
@@ -596,7 +723,9 @@
 
       container.innerHTML = `
         <div class="media-card">
-          <img src="${thumbUrl}" alt="Thumbnail" class="media-thumb">
+          <div class="media-thumb-box">
+            <img src="${thumbUrl}" alt="Thumbnail" class="media-thumb">
+          </div>
           <div class="media-details">
             <h2 class="media-title">${escapeHtml(info.title || 'Untitled Media')}</h2>
             <div class="media-meta">
@@ -604,6 +733,32 @@
               <span>⏱️ <strong>${durationStr}</strong></span>
               <span>🏷️ <strong>${escapeHtml(info.extractor || 'generic')}</strong></span>
             </div>
+
+            <div class="feature-toggles">
+              <label class="toggle-label">
+                <input type="checkbox" id="turboToggle" checked>
+                ⚡ Turbo Mode
+              </label>
+              <label class="toggle-label">
+                <input type="checkbox" id="sponsorBlockToggle" checked>
+                🛡️ Skip Sponsors
+              </label>
+              <label class="toggle-label">
+                <input type="checkbox" id="normalizeAudioToggle">
+                🔊 Audio Normalization
+              </label>
+              <label class="toggle-label">
+                <input type="checkbox" id="aiSummaryToggle">
+                📝 AI Summary
+              </label>
+              <div class="trim-box">
+                ✂️ Trim:
+                <input type="text" id="trimStart" class="trim-input" placeholder="00:00">
+                -
+                <input type="text" id="trimEnd" class="trim-input" placeholder="End">
+              </div>
+            </div>
+
             <div class="action-row">
               <select id="formatSelect" class="select-format">
                 <option value="bestvideo+bestaudio/best">⚡ Best Quality (Auto-mux)</option>
@@ -623,6 +778,17 @@
       const formatSelect = document.getElementById('formatSelect');
       const format = formatSelect ? formatSelect.value : 'bestvideo+bestaudio/best';
       const isAudioOnly = format === 'bestaudio';
+      const turbo = document.getElementById('turboToggle') ? document.getElementById('turboToggle').checked : false;
+      const skipSponsors = document.getElementById('sponsorBlockToggle') ? document.getElementById('sponsorBlockToggle').checked : false;
+      const normAudio = document.getElementById('normalizeAudioToggle') ? document.getElementById('normalizeAudioToggle').checked : false;
+      const aiSummary = document.getElementById('aiSummaryToggle') ? document.getElementById('aiSummaryToggle').checked : false;
+
+      const trimStart = document.getElementById('trimStart') ? document.getElementById('trimStart').value.trim() : '';
+      const trimEnd = document.getElementById('trimEnd') ? document.getElementById('trimEnd').value.trim() : '';
+      let timeRange = null;
+      if (trimStart || trimEnd) {
+        timeRange = (trimStart || '00:00') + '-' + (trimEnd || '');
+      }
 
       try {
         const resp = await fetch('/api/download', {
@@ -631,7 +797,12 @@
           body: JSON.stringify({
             url: url,
             format: format,
-            extract_audio: isAudioOnly
+            extract_audio: isAudioOnly,
+            turbo: turbo,
+            sponsorblock_remove: skipSponsors ? ['sponsor', 'intro', 'outro'] : null,
+            normalize_audio: normAudio,
+            ai_summary: aiSummary,
+            time_range: timeRange
           })
         });
         const res = await resp.json();
@@ -640,6 +811,31 @@
           fetchTasks();
         } else {
           alert('Download failed to start: ' + res.error);
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function startBatchDownload() {
+      const text = document.getElementById('batchInput').value.trim();
+      if (!text) return;
+      const urls = text.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+      if (urls.length === 0) return;
+
+      try {
+        const resp = await fetch('/api/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls: urls })
+        });
+        const res = await resp.json();
+        if (res.success) {
+          document.getElementById('batchInput').value = '';
+          switchTab('tasks');
+          fetchTasks();
+        } else {
+          alert('Batch submission error: ' + res.error);
         }
       } catch (err) {
         alert('Error: ' + err.message);
@@ -704,6 +900,7 @@
         const res = await resp.json();
         const grid = document.getElementById('platformsGrid');
         if (res.extractors) {
+          document.getElementById('extractorCount').innerText = res.extractors.length;
           grid.innerHTML = res.extractors.map(ie => `
             <div class="platform-card">
               <div class="platform-name">${escapeHtml(ie.name)}</div>
@@ -733,9 +930,10 @@
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Auto poll tasks every 1 second
+    // Auto poll tasks
     setInterval(fetchTasks, 1000);
     fetchTasks();
+    loadExtractors();
   </script>
 </body>
 </html>

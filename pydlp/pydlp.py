@@ -8,6 +8,7 @@ import os
 import sys
 from typing import Any, Callable, Dict, List, Optional, Union
 
+from pydlp.core.archive import DownloadArchive
 from pydlp.core.cache import Cache
 from pydlp.core.cookies import NetscapeCookieJar
 from pydlp.core.exceptions import (
@@ -21,6 +22,7 @@ from pydlp.core.exceptions import (
 )
 from pydlp.core.format_selector import FormatSelector
 from pydlp.core.http import HttpClient
+from pydlp.core.plugins import get_custom_postprocessors, load_plugins_from_directory
 from pydlp.core.progress import (
     ConsoleProgressBar,
     ProgressHookDispatcher,
@@ -34,11 +36,15 @@ from pydlp.downloader.direct import get_downloader
 from pydlp.extractor import find_extractor_for_url, list_extractors
 from pydlp.options import DEFAULT_OPTIONS
 from pydlp.postprocessor import (
+    AISummaryPostProcessor,
+    AudioNormalizerPostProcessor,
     ChapterPostProcessor,
     FFmpegPostProcessor,
     MetadataPostProcessor,
+    SponsorBlockPostProcessor,
     SubtitlePostProcessor,
     ThumbnailPostProcessor,
+    TimeRangeCutterPostProcessor,
     has_ffmpeg,
 )
 
@@ -50,6 +56,11 @@ class PyDLP:
         self.params = dict(DEFAULT_OPTIONS)
         if params:
             self.params.update(params)
+
+        # Load dynamic plugins from directory if specified
+        plugin_dir = self.params.get("plugin_dir")
+        if plugin_dir:
+            load_plugins_from_directory(plugin_dir)
 
         # Cookie Jar
         self.cookie_jar = NetscapeCookieJar()
@@ -63,7 +74,7 @@ class PyDLP:
         # HTTP Client
         self.http = HttpClient(
             user_agent=self.params.get("user_agent"),
-            timeout=float(self.params.get("timeout", 30.0)),
+            timeout=float(self.params.get("timeout", 15.0)),
             max_retries=int(self.params.get("retries", 3)),
             proxy=self.params.get("proxy"),
             verify_ssl=not self.params.get("nocheckcertificate", False),
@@ -76,10 +87,21 @@ class PyDLP:
         self.cache = Cache(enabled=self.params.get("cachedir") is not False)
         self.http.cache = self.cache
 
+        # Download Archive
+        self.archive = DownloadArchive(self.params.get("download_archive"))
+
         # Progress hooks and dispatcher
         self.progress_dispatcher = ProgressHookDispatcher()
-        if not self.params.get("quiet", False) and not self.params.get("dumpjson", False) and not self.params.get("dumpsinglejson", False):
-            self.progress_dispatcher.add_hook(ConsoleProgressBar(enable_colors=self.params.get("color", True)))
+        if (
+            not self.params.get("quiet", False)
+            and not self.params.get("dumpjson", False)
+            and not self.params.get("dump_json", False)
+            and not self.params.get("dumpsinglejson", False)
+            and not self.params.get("dump_single_json", False)
+        ):
+            self.progress_dispatcher.add_hook(
+                ConsoleProgressBar(enable_colors=self.params.get("color", True))
+            )
 
         # Format selector & Template formatter
         self.format_selector = FormatSelector(self.params.get("format"))
@@ -88,14 +110,21 @@ class PyDLP:
             restricted=self.params.get("restrictfilenames", False),
         )
 
-        # Post-processors
+        # Built-in and custom post-processors
         self._postprocessors = [
             SubtitlePostProcessor(self.http, self.params),
             ThumbnailPostProcessor(self.http, self.params),
             MetadataPostProcessor(self.params),
+            SponsorBlockPostProcessor(self.http, self.params),
+            TimeRangeCutterPostProcessor(self.params),
+            AudioNormalizerPostProcessor(self.params),
+            AISummaryPostProcessor(self.http, self.params),
             ChapterPostProcessor(self.params),
             FFmpegPostProcessor(self.params),
         ]
+        # Append registered custom post-processors
+        for custom_pp_cls in get_custom_postprocessors():
+            self._postprocessors.append(custom_pp_cls(self.params))
 
     def add_progress_hook(self, hook: Callable[[DownloadProgress], None]) -> None:
         """Registers a custom progress event listener."""
@@ -151,6 +180,11 @@ class PyDLP:
         if extra_info:
             info.extra_info.update(extra_info)
 
+        # Check Download Archive
+        if self.archive.contains(info):
+            self._report_info(f"[{info.id}] has already been recorded in archive; skipping download")
+            return info
+
         # Handle Playlist
         if info.is_playlist():
             return self._process_playlist(info, download=download)
@@ -175,13 +209,16 @@ class PyDLP:
 
         # Process and download single video
         self._process_video_download(info)
+
+        # Record in archive
+        self.archive.record(info)
         return info
 
     def _process_playlist(self, info: MediaInfo, download: bool = True) -> MediaInfo:
         """Processes and filters playlist entries."""
         self._report_info(f"Downloading playlist: {info.title} ({len(info.entries or [])} items)")
 
-        if self.params.get("dumpsinglejson", False):
+        if self.params.get("dumpsinglejson", False) or self.params.get("dump_single_json", False):
             print(json.dumps(info.to_dict(), indent=2, ensure_ascii=False))
             return info
 

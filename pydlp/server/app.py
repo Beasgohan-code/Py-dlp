@@ -45,7 +45,7 @@ class PyDLPRequestHandler(http.server.BaseHTTPRequestHandler):
         if path == "/api/status":
             self._send_json(
                 {
-                    "name": "Py-dlp",
+                    "name": "Py-dlp Studio",
                     "version": __version__,
                     "status": "online",
                     "extractors_count": len(list_extractors()),
@@ -155,16 +155,37 @@ class PyDLPRequestHandler(http.server.BaseHTTPRequestHandler):
                 "extract_audio": bool(req_data.get("extract_audio", False)),
                 "audio_format": req_data.get("audio_format", "mp3"),
                 "paths": req_data.get("paths"),
+                "turbo": bool(req_data.get("turbo", False)),
+                "sponsorblock_remove": req_data.get("sponsorblock_remove"),
+                "normalize_audio": bool(req_data.get("normalize_audio", False)),
+                "ai_summary": bool(req_data.get("ai_summary", False)),
+                "time_range": req_data.get("time_range"),
             }
             task_id = GLOBAL_TASK_MANAGER.submit_task(url, options)
             self._send_json({"success": True, "task_id": task_id})
+            return
+
+        # 3. API: /api/batch
+        elif path == "/api/batch":
+            urls = req_data.get("urls", [])
+            if not urls or not isinstance(urls, list):
+                self._send_json({"error": "Missing 'urls' array", "success": False}, status_code=400)
+                return
+
+            task_ids = []
+            for u in urls:
+                clean_u = str(u).strip()
+                if clean_u:
+                    tid = GLOBAL_TASK_MANAGER.submit_task(clean_u, req_data.get("options", {}))
+                    task_ids.append(tid)
+
+            self._send_json({"success": True, "task_ids": task_ids, "queued_count": len(task_ids)})
             return
 
         else:
             self._send_json({"error": "Not Found"}, status_code=404)
 
     def log_message(self, format: str, *args: Any) -> None:
-        # Clean log silencing
         pass
 
 
@@ -172,7 +193,7 @@ def run_server(host: str = "0.0.0.0", port: int = 8000) -> None:
     """Starts the built-in Py-dlp Web Server."""
     server_address = (host, port)
     httpd = http.server.ThreadingHTTPServer(server_address, PyDLPRequestHandler)
-    print(f"[server] Py-dlp Web UI running at http://{host}:{port}/")
+    print(f"[server] Py-dlp Studio running at http://{host}:{port}/")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

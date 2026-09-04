@@ -5,12 +5,14 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from pydlp.core.http import HttpClient
+from pydlp.core.plugins import get_custom_downloaders
 from pydlp.core.types import MediaFormat
 from pydlp.downloader.base import BaseDownloader
 from pydlp.downloader.dash import DashDownloader
 from pydlp.downloader.hls import HlsDownloader
 from pydlp.downloader.http import HttpDownloader
 from pydlp.downloader.multisegment import MultiSegmentDownloader
+from pydlp.downloader.turbo import TurboDownloader
 
 
 def get_downloader(
@@ -23,10 +25,17 @@ def get_downloader(
     proto = (fmt.protocol or "").lower()
     url = (fmt.url or "").lower()
 
+    # Check custom plugin downloaders
+    custom_dls = get_custom_downloaders()
+    if proto in custom_dls:
+        return custom_dls[proto](http_client, opts)
+
     if fmt.is_hls or "m3u8" in proto or ".m3u8" in url:
         return HlsDownloader(http_client, opts)
     elif fmt.is_dash or "mpd" in proto or ".mpd" in url:
         return DashDownloader(http_client, opts)
+    elif opts.get("turbo", False):
+        return TurboDownloader(http_client, opts)
     elif opts.get("concurrent_fragments", 1) > 1:
         return MultiSegmentDownloader(http_client, opts)
     else:

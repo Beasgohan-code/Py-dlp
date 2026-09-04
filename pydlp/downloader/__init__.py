@@ -6,11 +6,13 @@ from pydlp.downloader.direct import get_downloader
 from pydlp.downloader.hls import HlsDownloader
 from pydlp.downloader.http import HttpDownloader
 from pydlp.downloader.multisegment import MultiSegmentDownloader
+from pydlp.downloader.turbo import TurboDownloader
 
 __all__ = [
     "BaseDownloader",
     "HttpDownloader",
     "MultiSegmentDownloader",
+    "TurboDownloader",
     "HlsDownloader",
     "DashDownloader",
     "get_downloader",

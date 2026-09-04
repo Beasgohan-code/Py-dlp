@@ -28,7 +28,7 @@ class TestServer(unittest.TestCase):
         req = urllib.request.urlopen("http://127.0.0.1:18888/api/status")
         self.assertEqual(req.status, 200)
         data = json.loads(req.read().decode("utf-8"))
-        self.assertEqual(data["name"], "Py-dlp")
+        self.assertTrue(data["name"].startswith("Py-dlp"))
         self.assertEqual(data["status"], "online")
         self.assertGreaterEqual(data["extractors_count"], 15)
 

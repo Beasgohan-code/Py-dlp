@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydlp.version import __description__, __version__
 
@@ -32,6 +32,7 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "writechapters": False,
     "addmetadata": False,
     "concurrent_fragments": 1,
+    "turbo": False,
     "limit_rate": None,
     "retries": 3,
     "continue_dl": True,
@@ -50,6 +51,15 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "playlistitems": None,
     "noplaylist": False,
     "color": True,
+    "sponsorblock_remove": None,
+    "sponsorblock_mark": None,
+    "time_range": None,
+    "normalize_audio": False,
+    "target_lufs": -14.0,
+    "ai_summary": False,
+    "auto_chapters": False,
+    "download_archive": None,
+    "plugin_dir": None,
 }
 
 
@@ -87,10 +97,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     sel_group.add_argument("--playlist-end", type=int, help="Playlist video to end at")
     sel_group.add_argument("--playlist-items", type=str, help="Playlist video items to download (e.g. 1,2,5-8)")
     sel_group.add_argument("--no-playlist", action="store_true", help="Download only the video, if the URL refers to a video and a playlist")
+    sel_group.add_argument("--download-archive", type=str, help="Download only videos not listed in the archive file")
 
     # Download Options
     dl_group = parser.add_argument_group("Download Options")
     dl_group.add_argument("-N", "--concurrent-fragments", type=int, default=1, help="Number of concurrent chunk download threads (default: 1)")
+    dl_group.add_argument("--turbo", action="store_true", help="Enable Adaptive Turbo multi-connection download engine")
     dl_group.add_argument("-r", "--limit-rate", type=str, help="Maximum download rate in bytes per second (e.g. 50K or 4.2M)")
     dl_group.add_argument("-R", "--retries", type=int, default=3, help="Number of retries (default: 3)")
     dl_group.add_argument("--no-continue", action="store_true", help="Do not resume partially downloaded files (restart from beginning)")
@@ -103,6 +115,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     fs_group.add_argument("-P", "--paths", type=str, help="The paths where the files should be downloaded")
     fs_group.add_argument("--restrict-filenames", action="store_true", help="Restrict filenames to only ASCII characters, and avoid spaces")
     fs_group.add_argument("-k", "--keep-video", action="store_true", help="Keep the intermediate video file on disk after post-processing")
+
+    # Slicing & SponsorBlock (Advanced)
+    adv_group = parser.add_argument_group("Smart Slicing & SponsorBlock Options")
+    adv_group.add_argument("--sponsorblock-remove", type=str, help="SponsorBlock categories to cut out (e.g. 'sponsor,intro,outro,all')")
+    adv_group.add_argument("--sponsorblock-mark", type=str, help="SponsorBlock categories to mark as chapters")
+    adv_group.add_argument("--time-range", "--download-sections", dest="time_range", type=str, help="Download/trim specific time range (e.g. '*01:00-03:30' or '60-210')")
+    adv_group.add_argument("--normalize-audio", action="store_true", help="Apply EBU R128 audio loudness normalization")
+    adv_group.add_argument("--target-lufs", type=float, default=-14.0, help="Target LUFS for audio normalization (default: -14.0)")
+    adv_group.add_argument("--ai-summary", action="store_true", help="Auto-generate structured Markdown summary & key takeaways from transcripts")
+    adv_group.add_argument("--auto-chapters", action="store_true", help="Auto-detect topic transitions and generate smart chapter timestamps")
+    adv_group.add_argument("--plugin-dir", type=str, help="Directory path to load custom Py-dlp plugin modules from")
 
     # Thumbnail Options
     thumb_group = parser.add_argument_group("Thumbnail Options")
@@ -134,7 +157,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     # Network Options
     net_group = parser.add_argument_group("Network Options")
     net_group.add_argument("--proxy", type=str, help="Use the specified HTTP/HTTPS/SOCKS proxy")
-    net_group.add_argument("--socket-timeout", type=float, default=30.0, help="Time to wait before giving up, in seconds")
+    net_group.add_argument("--socket-timeout", type=float, default=15.0, help="Time to wait before giving up, in seconds")
     net_group.add_argument("--user-agent", type=str, help="Specify a custom user agent")
     net_group.add_argument("--referer", type=str, help="Specify a custom referer")
     net_group.add_argument("--add-header", action="append", help="Specify a custom HTTP header (FIELD:VALUE)")
@@ -164,6 +187,12 @@ def parse_cli_args(args: Optional[List[str]] = None) -> Tuple[argparse.Namespace
     # Process subtitleslangs comma-separated
     if isinstance(opts.get("subtitleslangs"), str):
         opts["subtitleslangs"] = [lang.strip() for lang in opts["subtitleslangs"].split(",") if lang.strip()]
+
+    # Process sponsorblock categories
+    if parsed.sponsorblock_remove:
+        opts["sponsorblock_remove"] = [c.strip() for c in parsed.sponsorblock_remove.split(",") if c.strip()]
+    if parsed.sponsorblock_mark:
+        opts["sponsorblock_mark"] = [c.strip() for c in parsed.sponsorblock_mark.split(",") if c.strip()]
 
     # Parse limit rate
     if parsed.limit_rate:

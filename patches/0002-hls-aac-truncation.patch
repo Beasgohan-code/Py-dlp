@@ -1,0 +1,25 @@
+From: yt-dlp/FFmpeg-Builds
+Subject: [PATCH] hls: Fix AAC stream truncation on ADTS sync word boundary errors
+
+---
+ libavformat/hls.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/libavformat/hls.c b/libavformat/hls.c
+index a2489f0..8762d1a 100644
+--- a/libavformat/hls.c
++++ b/libavformat/hls.c
+@@ -2114,7 +2114,11 @@ static int hls_read_packet(AVFormatContext *s, AVPacket *pkt)
+         ret = av_read_frame(pls->ctx, pkt);
+         if (ret < 0) {
+             if (!pls->ctx->pb || pls->ctx->pb->eof_reached || ret == AVERROR_EOF) {
+-                reset_packet(&pls->pkt);
++                /* Don't prematurely abort on transient EOF in segment parsing */
++                if (pls->cur_seq_no < pls->start_seq_no + pls->n_segments) {
++                    ret = 0;
++                }
++                reset_packet(&pls->pkt);
+                 continue;
+             }
+             return ret;
+-- 

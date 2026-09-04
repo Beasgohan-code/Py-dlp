@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Standard%20Library)-success.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
-[![Tests](https://img.shields.io/badge/tests-passing%20(103%2F103)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
+[![Tests](https://img.shields.io/badge/tests-passing%20(109%2F109)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 
 *A modular, blazing-fast, and complete media extraction and download engine engineered with zero required external dependencies, rich CLI formatting, Universal All-Rounder Downloader dispatch, HLS/DASH streaming, continuous live recording, SponsorBlock removal, AI transcript summarization, and a built-in modern Web Studio Dashboard.*
 
@@ -232,6 +232,54 @@ pydlp --import-m3u playlist.m3u
 ```bash
 # Start embedded Web UI on port 8000
 pydlp --serve --port 8000
+```
+
+---
+
+## 🎥 Static FFmpeg Builds for yt-dlp & Py-dlp
+
+This repository provides automated, static, zero-dependency builds of **FFmpeg** and **FFprobe** for **Windows** (`x64`, `x86`) and **Linux** (`x64`, `ARM64`), patched and optimized specifically for smooth integration with **yt-dlp** and **Py-dlp**.
+
+### ⬇️ Downloads Matrix
+
+<!-- BEGIN_DOWNLOAD_MATRIX -->
+| Platform / Architecture | Variant | FFmpeg Master (Nightly) | Latest Stable Release | Checksums |
+| :--- | :--- | :--- | :--- | :--- |
+| **Windows 64-bit (x64)** | GPL Static | [⬇️ `.zip`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) | [⬇️ `.zip`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-release-latest-win64-gpl.zip) | [SHA256](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip.sha256) |
+| **Windows 32-bit (x86)** | GPL Static | [⬇️ `.zip`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-win32-gpl.zip) | [⬇️ `.zip`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-release-latest-win32-gpl.zip) | [SHA256](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-win32-gpl.zip.sha256) |
+| **Linux 64-bit (x86_64)** | GPL Static | [⬇️ `.tar.xz`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz) | [⬇️ `.tar.xz`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-release-latest-linux64-gpl.tar.xz) | [SHA256](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz.sha256) |
+| **Linux ARM64 (aarch64)** | GPL Static | [⬇️ `.tar.xz`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-linuxarm64-gpl.tar.xz) | [⬇️ `.tar.xz`](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-release-latest-linuxarm64-gpl.tar.xz) | [SHA256](https://github.com/Beasgohan-code/Py-dlp/releases/download/latest/ffmpeg-master-latest-linuxarm64-gpl.tar.xz.sha256) |
+<!-- END_DOWNLOAD_MATRIX -->
+
+### 🛠️ Using with yt-dlp & Py-dlp
+Unpack the archive and place `ffmpeg` and `ffprobe` in your system `PATH`, or specify the directory explicitly:
+```bash
+# Point yt-dlp to the extracted binaries
+yt-dlp --ffmpeg-location ./bin/ "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# Or with Py-dlp
+pydlp --ffmpeg-location ./bin/ "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+```
+
+### 🧩 Included Patches & Features
+- ⚡ **Non-standard HEVC in FLV Demuxing**: Fixes playback and remuxing of HEVC FLV live streams from Asian streaming platforms (Bilibili, Huya, Douyu).
+- ⚡ **HLS AAC Truncation Fix**: Prevents premature stream cutting when encountering non-standard ADTS headers in HLS streams.
+- ⚡ **Encrypted Protocol Support**: Built with **OpenSSL** and **libxml2** for direct downloading and parsing of HTTPS, HLS, and DASH MPD manifests.
+- ⚡ **Essential Codecs**: Includes `libx264`, `libx265`, `libvpx` (VP8/VP9), `libdav1d` (AV1), `libmp3lame`, `libopus`, `libvorbis`, `libass`, `libfreetype`, and `libfribidi`.
+
+### 🏗️ Building Static Binaries Locally
+
+You can generate build plans, build Docker containers, or run cross-compilations locally:
+
+```bash
+# 1. Preview the build plan for a target
+./generate.sh win64 master
+
+# 2. Build the Docker compilation container for a target
+./makeimage.sh win64
+
+# 3. Compile and package static binaries
+./build.sh win64 master
 ```
 
 ---

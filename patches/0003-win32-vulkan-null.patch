@@ -1,0 +1,21 @@
+From: yt-dlp/FFmpeg-Builds
+Subject: [PATCH] hwcontext_vulkan: Fix 32-bit integer cast for Vulkan NULL handles
+
+---
+ libavutil/hwcontext_vulkan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libavutil/hwcontext_vulkan.c b/libavutil/hwcontext_vulkan.c
+index fe71822..b37aa0a 100644
+--- a/libavutil/hwcontext_vulkan.c
++++ b/libavutil/hwcontext_vulkan.c
+@@ -348,7 +348,7 @@ static void free_exec_ctx(AVHWDeviceContext *ctx, VulkanExecCtx *cmd)
+     AVVulkanDeviceContext *hwctx = ctx->hwctx;
+     VulkanDevicePriv *p = ctx->internal->priv;
+ 
+-    if (cmd->fence != VK_NULL_HANDLE)
++    if ((uintptr_t)cmd->fence != (uintptr_t)VK_NULL_HANDLE)
+         vk->DestroyFence(hwctx->act_dev, cmd->fence, hwctx->alloc);
+     av_freep(&cmd->bufs);
+ }
+-- 

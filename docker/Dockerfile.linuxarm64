@@ -1,0 +1,34 @@
+# docker/Dockerfile.linuxarm64 - Linux ARM64 cross-compilation environment
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
+    cmake \
+    meson \
+    ninja-build \
+    nasm \
+    yasm \
+    git \
+    curl \
+    ca-certificates \
+    tar \
+    xz-utils \
+    bzip2 \
+    unzip \
+    zip \
+    patch \
+    python3 \
+    gcc-aarch64-linux-gnu \
+    g++-aarch64-linux-gnu \
+    binutils-aarch64-linux-gnu \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV TARGET=linuxarm64
+WORKDIR /build

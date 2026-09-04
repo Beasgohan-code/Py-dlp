@@ -1,0 +1,151 @@
+name: Build and Publish Static FFmpeg for yt-dlp
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Daily at 02:00 UTC
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target Architecture (or all)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - win64
+          - win32
+          - linux64
+          - linuxarm64
+      branch:
+        description: 'FFmpeg Branch'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - master
+          - release
+  push:
+    branches:
+      - main
+      - arena/*
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-matrix:
+    name: Build ${{ matrix.target }} (${{ matrix.branch }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [win64, win32, linux64, linuxarm64]
+        branch: [master, release]
+        exclude: []
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Source Downloads
+        uses: actions/cache@v4
+        with:
+          path: .cache/downloads
+          key: ffmpeg-deps-${{ runner.os }}-${{ hashFiles('download.sh', 'scripts.d/*.sh') }}
+          restore-keys: |
+            ffmpeg-deps-${{ runner.os }}-
+
+      - name: Build Target Docker Container
+        run: |
+          chmod +x *.sh scripts.d/*.sh util/*.sh
+          ./makeimage.sh ${{ matrix.target }}
+
+      - name: Resolve Release Branch
+        id: branch_resolver
+        run: |
+          if [ "${{ matrix.branch }}" = "release" ]; then
+            # Query latest release branch from FFmpeg repo
+            RESOLVED_BRANCH=$(git ls-remote --heads https://github.com/FFmpeg/FFmpeg.git "release/*" | awk '{print $2}' | sed 's|refs/heads/||' | sort -V | tail -n1)
+            echo "resolved_branch=${RESOLVED_BRANCH:-release/7.1}" >> $GITHUB_OUTPUT
+          else
+            echo "resolved_branch=master" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Execute Static Build in Container
+        run: |
+          mkdir -p artifacts .cache/downloads
+          docker run --rm \
+            -e TARGET=${{ matrix.target }} \
+            -e FFMPEG_BRANCH=${{ steps.branch_resolver.outputs.resolved_branch }} \
+            -e BUILD_DIR=/build \
+            -e INSTALL_DIR=/opt/ffmpeg-static \
+            -e SRC_DIR=/build/src \
+            -e ARTIFACTS_DIR=/build/artifacts \
+            -e CACHE_DIR=/build/.cache/downloads \
+            -e PATCHES_DIR=/build/patches \
+            -v "${{ github.workspace }}:/build" \
+            ffbuilder-${{ matrix.target }}:latest \
+            /build/build.sh ${{ matrix.target }} ${{ steps.branch_resolver.outputs.resolved_branch }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ matrix.branch }}-${{ matrix.target }}
+          path: artifacts/*
+          if-no-files-found: error
+
+  publish-releases:
+    name: Publish GitHub Releases
+    needs: build-matrix
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download All Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
+
+      - name: Prepare Release Directory & Checksums
+        id: prep
+        run: |
+          mkdir -p release-dist
+          find all-artifacts -type f -exec cp {} release-dist/ \;
+          cd release-dist
+          sha256sum * > SHA256SUMS.txt
+          RELEASE_DATE=$(date -u +"%Y.%m.%d")
+          echo "release_tag=v${RELEASE_DATE}" >> $GITHUB_OUTPUT
+          echo "release_date=${RELEASE_DATE}" >> $GITHUB_OUTPUT
+
+      - name: Create / Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main') || github.event_name == 'schedule'
+        with:
+          tag_name: ${{ steps.prep.outputs.release_tag }}
+          name: "FFmpeg Static Builds for yt-dlp (${{ steps.prep.outputs.release_date }})"
+          body: |
+            Automated Static FFmpeg builds specifically patched and optimized for **yt-dlp**.
+
+            ### Included Builds:
+            - **Windows x64** (`x86_64-w64-mingw32`): GPL Master & Latest Release
+            - **Windows x86** (`i686-w64-mingw32`): GPL Master & Latest Release
+            - **Linux x64** (`x86_64-linux-gnu`): GPL Master & Latest Release
+            - **Linux ARM64** (`aarch64-linux-gnu`): GPL Master & Latest Release
+
+            ### Features & Patches:
+            - Enabled OpenSSL for HTTPS/TLS encrypted HLS & DASH streams
+            - Enabled libxml2 for DASH manifest parsing
+            - Codecs: libx264, libx265, libvpx, libdav1d (AV1), libmp3lame, libopus, libvorbis
+            - Subtitles: libass, libfreetype, libfribidi
+            - yt-dlp patches: Non-standard HEVC in FLV decoding, AAC stream truncation fix
+          files: release-dist/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

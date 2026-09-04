@@ -1,0 +1,45 @@
+From: yt-dlp/FFmpeg-Builds
+Subject: [PATCH] flvdec: Add support for non-standard HEVC codec ID in FLV
+
+---
+ libavformat/flv.h    | 1 +
+ libavformat/flvdec.c | 8 ++++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/libavformat/flv.h b/libavformat/flv.h
+index b731d55..1e8e2fa 100644
+--- a/libavformat/flv.h
++++ b/libavformat/flv.h
+@@ -110,6 +110,7 @@ enum {
+     FLV_CODECID_H264    = 7,
+     FLV_CODECID_REALH263= 8,
+     FLV_CODECID_MPEG4   = 9,
++    FLV_CODECID_HEVC    = 12,
+ };
+ 
+ enum {
+diff --git a/libavformat/flvdec.c b/libavformat/flvdec.c
+index 287fb6a..bbd1469 100644
+--- a/libavformat/flvdec.c
++++ b/libavformat/flvdec.c
+@@ -328,6 +328,10 @@ static int flv_same_video_codec(AVCodecParameters *vpar, uint32_t flv_codecid)
+         return vpar->codec_id == AV_CODEC_ID_VP6A;
+     case FLV_CODECID_H264:
+         return vpar->codec_id == AV_CODEC_ID_H264;
++    case FLV_CODECID_HEVC:
++        return vpar->codec_id == AV_CODEC_ID_HEVC;
+     default:
+         return vpar->codec_tag == flv_codecid;
+     }
+@@ -367,6 +371,10 @@ static int flv_set_video_codec(AVFormatContext *s, AVStream *vstream, uint32_t f
+     case FLV_CODECID_H264:
+         par->codec_id = AV_CODEC_ID_H264;
+         return 3;
++    case FLV_CODECID_HEVC:
++        par->codec_id = AV_CODEC_ID_HEVC;
++        vstream->need_parsing = AVSTREAM_PARSE_HEADERS;
++        return 3;
+     default:
+         avpriv_set_pts_info(vstream, 32, 1, 1000);
+         par->codec_tag = flv_codecid;
+-- 

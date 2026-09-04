@@ -58,7 +58,7 @@ def main(args: Optional[List[str]] = None) -> int:
         print(format_table(headers, rows))
         return 0
 
-    # 5. Check for input URLs or batch file
+    # 5. Check for input URLs, batch file, or bookmark/m3u imports
     urls = list(opts.get("urls", []))
     batch_file = opts.get("batchfile")
     if batch_file:
@@ -75,6 +75,21 @@ def main(args: Optional[List[str]] = None) -> int:
         except Exception as e:
             print(f"[error] Failed to read batch file {batch_file}: {e}", file=sys.stderr)
             return 1
+
+    # Check Bookmark / Playlist Importers
+    import_bm = opts.get("import_bookmarks")
+    if import_bm:
+        from pydlp.core.bookmarks import BookmarkImporter
+        imported = BookmarkImporter.import_file(import_bm)
+        print(f"[info] Imported {len(imported)} URLs from bookmarks: {import_bm}")
+        urls.extend(imported)
+
+    import_m3u = opts.get("import_m3u")
+    if import_m3u:
+        from pydlp.core.bookmarks import BookmarkImporter
+        imported = BookmarkImporter.parse_m3u_playlist(import_m3u)
+        print(f"[info] Imported {len(imported)} URLs from playlist: {import_m3u}")
+        urls.extend(imported)
 
     if not urls:
         parser = build_arg_parser()
@@ -100,7 +115,15 @@ def main(args: Optional[List[str]] = None) -> int:
                 player.play(info, fmt)
         return 0
 
-    # 8. Instantiate PyDLP and run download
+    # 8. Check Watcher Daemon Mode
+    if opts.get("watch", False):
+        from pydlp.core.watcher import WatcherDaemon
+        engine = PyDLP(opts)
+        daemon = WatcherDaemon(engine, urls, interval=int(opts.get("watch_interval", 60)))
+        daemon.run()
+        return 0
+
+    # 9. Instantiate PyDLP and run download
     try:
         engine = PyDLP(opts)
         exit_code = engine.download(urls)

@@ -105,13 +105,7 @@ class ResumableDownloader(BaseDownloader):
                         f.write(chunk)
                         downloaded_bytes += len(chunk)
                         self.speed_calc.update(downloaded_bytes)
-
-                        # Rate limiting throttle
-                        if self.limit_rate:
-                            target_time = len(chunk) / float(self.limit_rate)
-                            elapsed = time.time() - chunk_start
-                            if target_time > elapsed:
-                                time.sleep(target_time - elapsed)
+                        self.throttle(len(chunk))
 
                         now = time.time()
                         if now - last_dispatch >= 0.2:

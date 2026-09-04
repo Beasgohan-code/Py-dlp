@@ -18,6 +18,12 @@ def has_ffmpeg(ffmpeg_path: Optional[str] = None) -> bool:
     return shutil.which(bin_name) is not None
 
 
+def get_ffmpeg_path(ffmpeg_location: Optional[str] = None) -> Optional[str]:
+    """Returns resolved path to ffmpeg binary or None if not found."""
+    bin_name = ffmpeg_location or "ffmpeg"
+    return shutil.which(bin_name)
+
+
 class FFmpegPostProcessor(BasePostProcessor):
     """Executes FFmpeg commands for media processing."""
 

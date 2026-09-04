@@ -66,6 +66,7 @@ class HttpDownloader(BaseDownloader):
                     self.check_canceled()
                     f.write(chunk)
                     downloaded_bytes += len(chunk)
+                    self.throttle(len(chunk))
 
                     now = time.monotonic()
                     if now - last_progress_time >= 0.1:

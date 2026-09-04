@@ -148,8 +148,8 @@ class MediaInfo:
     """Represents a media item or playlist extracted from a URL."""
     id: str
     title: str
-    extractor: str
-    extractor_key: str
+    extractor: str = "generic"
+    extractor_key: str = "generic"
     webpage_url: str = ""
     url: Optional[str] = None
     formats: List[MediaFormat] = field(default_factory=list)

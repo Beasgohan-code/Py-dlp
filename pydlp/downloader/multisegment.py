@@ -116,6 +116,7 @@ class MultiSegmentDownloader(BaseDownloader):
                 for chunk in stream:
                     self.check_canceled()
                     sf.write(chunk)
+                    self.throttle(len(chunk))
                     with lock:
                         downloaded_per_seg[seg_idx] += len(chunk)
                     report_progress()

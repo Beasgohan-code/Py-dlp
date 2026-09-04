@@ -95,6 +95,7 @@ from pydlp.extractor.thumbzilla import ThumbzillaIE
 from pydlp.extractor.tidal import TidalIE
 from pydlp.extractor.tiktok import TikTokIE
 from pydlp.extractor.tnaflix import TnaFlixIE
+from pydlp.extractor.torrent import TorrentExtractor
 from pydlp.extractor.trovo import TrovoIE
 from pydlp.extractor.tube8 import Tube8IE
 from pydlp.extractor.tunein import TuneInIE
@@ -230,6 +231,7 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     FacebookIE,
     ArchiveOrgIE,
     PeerTubeIE,
+    TorrentExtractor,
     GenericIE,  # Must be last as fallback
 ]
 

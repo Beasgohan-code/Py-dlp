@@ -22,6 +22,8 @@ from pydlp.core.exceptions import (
 )
 from pydlp.core.format_selector import FormatSelector
 from pydlp.core.http import HttpClient
+from pydlp.core.interactive import InteractiveSelector
+from pydlp.core.notifications import NotificationManager
 from pydlp.core.plugins import get_custom_postprocessors, load_plugins_from_directory
 from pydlp.core.progress import (
     ConsoleProgressBar,
@@ -30,6 +32,7 @@ from pydlp.core.progress import (
     colorize,
     print_format_table,
 )
+from pydlp.core.proxy_pool import ProxyPool
 from pydlp.core.template import TemplateFormatter
 from pydlp.core.types import DownloadProgress, MediaFormat, MediaInfo
 from pydlp.downloader.direct import get_downloader
@@ -40,6 +43,7 @@ from pydlp.postprocessor import (
     AudioNormalizerPostProcessor,
     ChapterPostProcessor,
     FFmpegPostProcessor,
+    MediaEnhancerPostProcessor,
     MetadataPostProcessor,
     SponsorBlockPostProcessor,
     SubtitlePostProcessor,
@@ -110,6 +114,17 @@ class PyDLP:
             restricted=self.params.get("restrictfilenames", False),
         )
 
+        # Proxy Pool
+        self.proxy_pool = None
+        if self.params.get("proxy_pool"):
+            self.proxy_pool = ProxyPool(self.params.get("proxy_pool"))
+            current_p = self.proxy_pool.get_proxy()
+            if current_p:
+                self.http.proxy = current_p
+
+        # Notification Manager
+        self.notifier = NotificationManager(self.params)
+
         # Built-in and custom post-processors
         self._postprocessors = [
             SubtitlePostProcessor(self.http, self.params),
@@ -118,6 +133,7 @@ class PyDLP:
             SponsorBlockPostProcessor(self.http, self.params),
             TimeRangeCutterPostProcessor(self.params),
             AudioNormalizerPostProcessor(self.params),
+            MediaEnhancerPostProcessor(self.params),
             AISummaryPostProcessor(self.http, self.params),
             ChapterPostProcessor(self.params),
             FFmpegPostProcessor(self.params),
@@ -241,7 +257,15 @@ class PyDLP:
 
     def _process_video_download(self, info: MediaInfo) -> None:
         """Selects format, runs download engines, merges audio/video if needed, and applies post-processors."""
-        selected_formats = self.format_selector.select_formats(info)
+        if self.params.get("interactive", False):
+            user_fmts = InteractiveSelector(color=self.params.get("color", True)).display_and_select(info)
+            if user_fmts:
+                selected_formats = user_fmts
+            else:
+                selected_formats = self.format_selector.select_formats(info)
+        else:
+            selected_formats = self.format_selector.select_formats(info)
+
         if not selected_formats:
             raise FormatNotAvailableError(f"No formats available for {info.title}")
 
@@ -263,6 +287,10 @@ class PyDLP:
             os.makedirs(dest_dir, exist_ok=True)
 
         downloaded_files: List[str] = []
+        dl_start_time = time.monotonic()
+
+        # Notify download start
+        self.notifier.notify_download_start(info)
 
         # Download selected stream(s)
         if len(selected_formats) == 1:
@@ -329,6 +357,9 @@ class PyDLP:
             except Exception as e:
                 self._report_warning(f"Post-processor {pp.__class__.__name__} failed: {e}")
 
+        elapsed_sec = time.monotonic() - dl_start_time
+        final_size = os.path.getsize(info.filepath) if os.path.exists(info.filepath) else None
+        self.notifier.notify_download_complete(info, info.filepath, elapsed_sec, final_size)
         self._report_info(f"Finished processing: {info.filepath}")
 
     def download(self, url_list: Union[str, List[str]]) -> int:
@@ -342,6 +373,7 @@ class PyDLP:
                 self.extract_info(url, download=True)
             except Exception as e:
                 self._report_error(f"Failed to download {url}: {e}")
+                self.notifier.notify_download_error(url, str(e))
                 exit_code = 1
 
         return exit_code

@@ -8,7 +8,7 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Standard%20Library)-success.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
-[![Tests](https://img.shields.io/badge/tests-passing%20(76%2F76)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
+[![Tests](https://img.shields.io/badge/tests-passing%20(89%2F89)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 
 *A modular, blazing-fast, and complete media extraction and download engine engineered with zero required external dependencies, rich CLI formatting, Universal All-Rounder Downloader dispatch, HLS/DASH streaming, continuous live recording, SponsorBlock removal, AI transcript summarization, and a built-in modern Web Studio Dashboard.*
 
@@ -18,14 +18,26 @@
 
 ## 🌟 What Sets Py-dlp Apart
 
-- 🎯 **Zero Mandatory Dependencies**: Built 100% on Python's robust standard library (`urllib`, `concurrent.futures`, `http.client`, `json`, `xml`, `zipapp`, etc.). No bulky dependencies required.
-- 🚀 **105+ Native Built-in Extractors**: Comprehensive support covering Global TV broadcasters, Gaming/Esports live feeds, Education platforms, Mainstream social networks, Adult video/cam networks, Cyberlockers & cloud storage, and Music/Radio platforms.
+- 🎯 **Zero Mandatory Dependencies**: Built 100% on Python's robust standard library (`urllib`, `concurrent.futures`, `http.client`, `json`, `xml`, `sqlite3`, `zipapp`, etc.). No bulky dependencies required.
+- 🌐 **2,000+ Indexed Domains & Universal Media Engine**: Built-in comprehensive registry covering over 2,000 video, streaming, news, adult, anime, podcast, and cloud platforms with Schema.org JSON-LD, OpenGraph, Twitter Cards, and raw HLS/DASH fallback recognition.
+- 🚀 **106+ Dedicated High-Performance Extractors**: Fine-tuned scrapers for YouTube, Twitch, Kick, Bilibili, TikTok, Instagram, Twitter/X, Hanime Pro, Odysee, VK, Bluesky, Threads, Apple Podcasts, Spotify, and 30+ adult platforms.
+- 🎬 **Hanime Pro Plugin (`pydlp.plugins.hanime_plugin`)**: Direct API v8 integration, multi-bitrate resolution (1080p/720p/480p), franchise playlist auto-crawling, and `hanimesearch:query` instant search query support.
+- 🩺 **System Diagnostics Doctor (`--doctor`)**: Comprehensive inspection of TLS/SSL cipher engines, FFmpeg/FFprobe binaries, external downloaders (aria2c, curl, wget, axel), and extractor health.
+- 🍪 **Browser Cookie Extraction (`--cookies-from-browser`)**: Direct session cookie extraction from Chrome, Brave, Firefox, Edge, Safari, Opera, and Vivaldi profiles without manual Netscape `.txt` exporting.
+- 📺 **Direct Stream Player Piping (`--play`, `--player`)**: Stream extracted media manifests or direct URLs straight into external media players (`mpv`, `vlc`, `ffplay`).
 - ⚡ **Universal All-Rounder Downloader Suite (`pydlp.downloader`)**:
   - **Adaptive Turbo Engine (`--turbo`)**: Dynamically auto-tunes worker threads (4 to 32 parallel chunk streams) based on network latency and throughput profiling.
   - **Stateful Resumable Engine**: Persistent checkpointing via `.state.json`, automatic socket recovery, and MD5/SHA256 chunk integrity verification.
   - **Continuous Live Stream Recorder (`--live-record-duration`)**: Real-time sliding-window HLS & chunked WebSocket recording with automatic discontinuity handling.
   - **External Downloader Bridge (`--external-downloader aria2c/curl/wget/axel/ffmpeg`)**: Native subprocess dispatch with graceful standard library fallback.
-  - **Bandwidth Throttle & Limiter (`--limit-rate 5M`)**: Token bucket rate limiter for low-bandwidth environments.
+  - **Bandwidth Throttle & Limiter (`-r / --limit-rate 5M`)**: Token bucket rate limiter for smooth bandwidth shaping.
+- 🎛️ **Interactive Format Picker & TUI Explorer (`-i`, `--interactive`)**: Visual interactive stream explorer with colorized tables displaying resolution, fps, bitrate, codecs, and format IDs for user selection.
+- 📢 **Webhook & Push Notification System (`--notify-discord`, `--notify-telegram`, `--notify-webhook`)**: Rich Discord embed cards, Telegram alerts, and custom POST webhooks with video metadata, thumbnails, download speed, and duration stats.
+- 👁️ **Continuous Channel & Playlist Watcher Daemon (`--watch`, `--watch-interval 60`)**: Auto-polling daemon that monitors YouTube channels, playlists, or RSS feeds, leveraging download archives to retrieve only newly uploaded videos.
+- 🔄 **Dynamic Proxy Pool & Auto-Rotator (`--proxy-pool`, `--proxy-rotate`)**: Round-robin and random proxy rotation with error tracking and auto-failover upon HTTP 403/429 blocks.
+- 📑 **Browser Bookmarks & M3U Importer (`--import-bookmarks`, `--import-m3u`)**: Batch import and download video links directly from Netscape HTML bookmarks or `.m3u` playlist files.
+- 🎨 **Audio & Video Enhancer / Filter Suite (`pydlp.postprocessor.enhancer`)**: EBU R128 loudness normalization (`--audio-loudnorm`), pitch shifting (`--audio-pitch`), tempo adjustment (`--audio-tempo`), video speed scaling (`--video-speed`), video denoising (`--video-denoise`), and hardware acceleration transcoding (`--hardware-accel nvenc|vaapi|videotoolbox|qsv`).
+- 🧲 **BitTorrent & Magnet URI Extractor (`pydlp.extractor.torrent`)**: Native support for resolving Magnet links (`magnet:?xt=urn:btih:...`) and `.torrent` files.
 - 📦 **Single-Binary Standalone Executable**: Generates zero-dependency standalone Unix/Linux/macOS binaries and cross-platform ZipApps via `python3 bundle.py`.
 - 🛡️ **Built-in SponsorBlock Integration (`--sponsorblock-remove`)**: Seamlessly cuts out sponsored segments, intros, outros, self-promos, and interaction reminders automatically before saving to disk.
 - 📝 **Smart AI Summary & Topic Chaptering (`--ai-summary`, `--auto-chapters`)**: Analyzes subtitles and audio transcripts to auto-generate structured `.summary.md` notes and clean chapter timestamps.
@@ -37,200 +49,133 @@
 
 ---
 
-## 📊 105+ Supported Extractors Across Categories
+## 🚀 Quick Start & CLI Usage
 
-### 📺 1. Global TV & News Broadcasters
-- **Arte TV** (`arte.tv/en/videos/...`)
-- **BBC iPlayer & BBC News** (`bbc.co.uk/iplayer/...`, `bbc.com/news/...`)
-- **CBC Gem & Radio-Canada** (`cbc.ca/player/...`, `ici.radio-canada.ca/...`)
-- **RaiPlay** (`raiplay.it/video/...`)
-- **RTBF & VRT MAX** (`rtbf.be/auvio/...`, `vrt.be/vrtmax/...`)
-- **NHK World Japan** (`nhk.or.jp/nhkworld/...`, `nhk.jp/...`)
-- **France.tv, TF1+ & 6play** (`france.tv/...`, `tf1.fr/...`, `6play.fr/...`)
-- **ARD Mediathek & ZDF Mediathek** (`ardmediathek.de/...`, `zdf.de/...`)
-
-### 🎮 2. Gaming, Esports & Live Streaming
-- **Twitch** (`twitch.tv/...`, `clips.twitch.tv/...`)
-- **Kick** (`kick.com/...`, `kick.com/video/...`, `kick.com/clips/...`)
-- **Trovo** (`trovo.live/...`)
-- **AfreecaTV & SOOP Live** (`afreecatv.com/...`, `sooplive.co.kr/...`)
-- **Naver Chzzk** (`chzzk.naver.com/live/...`, `chzzk.naver.com/video/...`)
-- **Medal.tv** (`medal.tv/games/.../clips/...`)
-
-### 🎓 3. Education & Online Learning
-- **Coursera** (`coursera.org/learn/.../lecture/...`)
-- **Khan Academy** (`khanacademy.org/.../v/...`)
-- **edX** (`edx.org/course/...`)
-- **Udemy** (`udemy.com/course/...`)
-
-### 🎬 4. Mainstream Video & Social Media
-- **YouTube** (`youtube.com/watch?v=...`, `youtu.be/...`, `youtube.com/shorts/...`, playlists & search)
-- **TikTok** (`tiktok.com/@user/video/...`, `tiktok.com/v/...`)
-- **Instagram** (`instagram.com/p/...`, `/reel/...`, `/tv/...`)
-- **Twitter / X** (`twitter.com/.../status/...`, `x.com/.../status/...`)
-- **Reddit** (`reddit.com/r/...`, `v.redd.it/...` with native DASH multiplexing)
-- **Vimeo** (`vimeo.com/...`, `player.vimeo.com/video/...`)
-- **Dailymotion** (`dailymotion.com/video/...`)
-- **Facebook** (`facebook.com/watch/?v=...`, `facebook.com/reel/...`)
-- **Rumble** (`rumble.com/v...`)
-- **Bilibili** (`bilibili.com/video/BV...` / `av...`)
-- **Pinterest** (`pinterest.com/pin/...`)
-- **Threads** (`threads.net/@user/post/...`)
-- **Bluesky** (`bsky.app/profile/.../post/...`)
-- **Streamable** (`streamable.com/...`)
-- **Likee, Triller & Kwai** (`likee.video/@...`, `triller.co/@...`, `kwai.com/...`)
-- **LinkedIn** (`linkedin.com/posts/...`, `linkedin.com/feed/...`, `linkedin.com/learning/...`)
-- **Imgur** (`imgur.com/gallery/...`, `imgur.com/a/...`, `i.imgur.com/...`)
-- **Giphy** (`giphy.com/gifs/...`, `media.giphy.com/...`)
-- **9GAG** (`9gag.com/gag/...`)
-- **Coub** (`coub.com/view/...`)
-- **Mastodon & Fediverse** (`mastodon.social/@user/...`, `mstdn.jp/...`, `misskey.io/...`)
-- **PeerTube** (`peertube.tv/videos/watch/...`)
-- **Archive.org** (`archive.org/details/...`)
-
-### 🎌 5. Anime & Animation Platforms
-- **AnimePahe** (`animepahe.ru/play/...`, `animepahe.org/play/...`, `animepahe.com/play/...`)
-- **Crunchyroll** (`crunchyroll.com/watch/...`, `crunchyroll.com/series/...`)
-- **Aniwave / 9anime / Zoro / HiAnime** (`aniwave.to/watch/...`, `9anime.to/...`, `hianime.to/...`)
-- **Gogoanime / Anitaku** (`gogoanime3.co/...`, `anitaku.to/...`, `anitaku.pe/...`)
-- **HentaiHaven** (`hentaihaven.xxx/episode/...`, `hentaihaven.com/...`)
-- **Hanime** (`hanime.tv/videos/hentai/...`)
-
-### 🔒 6. Video Hosts & Cyberlockers
-- **Streamtape** (`streamtape.com/v/...`, `streamtape.net/v/...`, `streamta.pe/v/...`)
-- **Mixdrop** (`mixdrop.co/e/...`, `mixdrop.co/f/...`, `mixdrop.ag/...`)
-- **Doodstream** (`doodstream.com/d/...`, `doodstream.com/e/...`, `dood.so/...`, `dood.pm/...`, `dood.li/...`)
-- **Voe** (`voe.sx/e/...`, `voe.sx/...`, `reputationsickly.com/...`, `20demidistance4.com/...`)
-- **Filemoon** (`filemoon.sx/e/...`, `filemoon.sx/d/...`, `filemoon.to/...`, `vidcloud.co/...`)
-- **StreamSB / SBVideo** (`streamsb.net/e/...`, `sbembed.com/e/...`, `watchsb.com/e/...`, `playersb.com/e/...`)
-- **Google Drive & Dropbox** (`drive.google.com/file/d/...`, `dropbox.com/s/...`)
-- **MediaFire & Mega** (`mediafire.com/file/...`, `mega.nz/file/...`, `mega.co.nz/...`)
-
-### 📡 7. Enterprise & Alternative Video
-- **Loom** (`loom.com/share/...`)
-- **Wistia** (`fast.wistia.net/embed/iframe/...`, `wistia.com/...`)
-- **Brightcove** (`players.brightcove.net/...`, `brightcove.com/...`)
-- **JWPlayer** (`content.jwplatform.com/videos/...`, `cdn.jwplayer.com/players/...`)
-- **Vidyard & Brighteon** (`share.vidyard.com/watch/...`, `brighteon.com/...`)
-- **TED Talks** (`ted.com/talks/...`)
-- **Veoh** (`veoh.com/watch/...`)
-- **Nebula & Floatplane** (`nebula.tv/videos/...`, `floatplane.com/post/...`)
-- **Odysee & LBRY** (`odysee.com/@...`, `lbry.tv/...`)
-- **BitChute** (`bitchute.com/video/...`, `bitchute.com/channel/...`)
-- **DTube** (`d.tube/#!/v/...`)
-- **VK & VK Video** (`vk.com/video...`, `vkvideo.ru/...`, `vk.com/wall...`)
-- **AbemaTV & NicoNico Douga** (`abema.tv/...`, `nicovideo.jp/watch/sm...`)
-- **Douyin / Kuaishou / XiaoHongShu** (`douyin.com/video/...`, `iesdouyin.com/share/...`, `kuaishou.com/...`)
-
-### 🎵 8. Music, Audio & Live Radio
-- **Spotify** (`open.spotify.com/track/...`, `/album/...`, `/playlist/...`)
-- **SoundCloud** (`soundcloud.com/artist/track`, `/sets/...`)
-- **Deezer** (`deezer.com/track/...`, `deezer.com/album/...`, `deezer.page.link/...`)
-- **Apple Podcasts & Apple Music** (`podcasts.apple.com/...`, `music.apple.com/...`)
-- **Tidal** (`tidal.com/browse/track/...`, `listen.tidal.com/...`)
-- **Mixcloud** (`mixcloud.com/artist/show-name/`)
-- **Audiomack** (`audiomack.com/artist/song/...`, `audiomack.com/artist/album/...`)
-- **Bandcamp** (`artist.bandcamp.com/track/...`, `/album/...`)
-- **TuneIn Radio** (`tunein.com/radio/...`, `tunein.com/podcasts/...`)
-- **Mixlr Audio** (`mixlr.com/...`)
-- **Freesound, Hearthis.at & Jamendo** (`freesound.org/people/...`, `hearthis.at/...`, `jamendo.com/...`)
-- **Podcast / RSS** (`feeds.podcast.com/rss`, `*.rss`, `*.xml`)
-
-### 🔞 9. Adult Platforms & Live Cam Networks
-- **Pornhub** (`pornhub.com/view_video.php?viewkey=...`, `pornhubpremium.com/...`)
-- **XVideos & XNXX** (`xvideos.com/video...`, `xnxx.com/video...`)
-- **XHamster** (`xhamster.com/videos/...`, `xhamster.desi/movies/...`, `xhamster.one/...`)
-- **YouJizz** (`youjizz.com/videos/...`)
-- **SpankBang** (`spankbang.com/.../video/...`)
-- **RedTube & YouPorn** (`redtube.com/...`, `youporn.com/watch/...`)
-- **EPorner** (`eporner.com/video/...`)
-- **Motherless** (`motherless.com/...`)
-- **Beeg** (`beeg.com/...`)
-- **Tube8** (`tube8.com/...`)
-- **TnaFlix & EmpFlix** (`tnaflix.com/video...`, `empflix.com/...`)
-- **PornTrex** (`porntrex.com/videos/...`)
-- **Thumbzilla** (`thumbzilla.com/video/...`)
-- **ManyVids** (`manyvids.com/Video/...`)
-- **Fapello** (`fapello.com/user/id/`)
-- **Cumlouder & Daftsex** (`cumlouder.com/video/...`, `daftsex.com/watch/...`)
-- **Chaturbate & Stripchat** (`chaturbate.com/room/...`, `stripchat.com/...`)
-- **CamSoda, Cam4 & LiveJasmin** (`camsoda.com/...`, `cam4.com/...`, `livejasmin.com/...`)
-- **Rule34Video** (`rule34video.party/videos/...`)
-- **HQPorner & BongaCams** (`hqporner.com/hdporn/...`, `bongacams.com/...`)
-
-### 🌐 10. Universal Fallback
-- **Generic** (Any web page via HTML5 video/audio, OpenGraph meta, HLS `.m3u8`, DASH `.mpd`, schema.org)
-
----
-
-## 🚀 Quick Start (CLI)
-
+### 1. Basic Downloading & Format Selection
 ```bash
-# Basic download
+# Download best quality available
 pydlp "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
-# Batch download from a URL list file
-pydlp -a urls.txt
+# Interactive stream picker (inspect resolutions, bitrates, codecs)
+pydlp -i "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
-# Turbo multi-connection acceleration (dynamic speed auto-tuning)
-pydlp --turbo "https://example.com/large_video.mp4"
+# Select specific format or combination (1080p video + best audio)
+pydlp -f "bestvideo[height<=1080]+bestaudio/best" "https://vimeo.com/76979871"
 
-# External downloader integration (e.g. aria2c, curl, wget, axel, ffmpeg)
-pydlp --external-downloader aria2c "https://example.com/huge_file.mp4"
+# Pipe stream directly into MPV or VLC without downloading to disk
+pydlp --play --player mpv "https://www.twitch.tv/shroud"
+```
 
-# Record a live stream for 2 minutes (120 seconds)
-pydlp --live-record-duration 120 "https://twitch.tv/streamer"
+### 2. Universal 2,000+ Domain Search & Doctor Diagnostics
+```bash
+# Run system diagnostics
+pydlp --doctor
 
-# Remove sponsors, intros, and outros automatically
-pydlp --sponsorblock-remove sponsor,intro,outro "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+# Search supported media platforms and domains
+pydlp --search-sites anime
+pydlp --search-sites music
+pydlp --search-sites sports
+```
 
-# Trim specific time range (e.g. from 01:00 to 03:30)
-pydlp --time-range 01:00-03:30 "https://vimeo.com/76979871"
+### 3. Browser Cookies & Geo-Bypass
+```bash
+# Load authentication cookies directly from your browser
+pydlp --cookies-from-browser chrome "https://www.crunchyroll.com/watch/..."
 
-# Extract audio with EBU R128 loudness normalization
-pydlp -x --audio-format mp3 --normalize-audio "https://soundcloud.com/artist/track"
+# Geo-restriction bypass via header spoofing
+pydlp --geo-bypass --geo-bypass-country JP "https://abema.tv/now-on-air/..."
+```
 
-# Auto-generate AI summary notes and smart chapters
-pydlp --ai-summary --auto-chapters "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+### 4. Hanime Pro Search & Franchise Discovery
+```bash
+# Search and download directly
+pydlp "hanimesearch:overflow"
 
-# Rate limit download speed to 5 MB/s
-pydlp --limit-rate 5M "https://example.com/file.mp4"
+# Download complete franchise sequence
+pydlp "https://hanime.tv/videos/hentai/..."
+```
 
-# List all supported extractors (105+ platforms)
-pydlp --list-extractors
+### 5. High-Speed Downloading & Rate Limiting
+```bash
+# Adaptive Turbo multi-connection engine (16 parallel threads)
+pydlp --turbo -N 16 "https://archive.org/details/..."
 
-# Launch the Web Studio Dashboard & REST API
+# Limit download bandwidth (smooth token-bucket throttling)
+pydlp --limit-rate 2.5M "https://example.com/video.mp4"
+```
+
+### 6. Notifications & Webhooks (Discord, Telegram, Custom)
+```bash
+# Send Discord rich embed card on completion
+pydlp --notify-discord "https://discord.com/api/webhooks/..." "https://example.com/video"
+
+# Send Telegram alert
+pydlp --notify-telegram "BOT_TOKEN:CHAT_ID" "https://example.com/video"
+```
+
+### 7. Continuous Channel & Playlist Watcher Daemon
+```bash
+# Continuously poll playlist/channel every 60 seconds (only downloads new videos)
+pydlp --watch --watch-interval 60 --download-archive archive.txt "https://www.youtube.com/playlist?list=..."
+```
+
+### 8. Bookmarks & M3U Playlist Batch Import
+```bash
+# Import all video links from browser bookmarks export
+pydlp --import-bookmarks bookmarks.html
+
+# Import streams from IPTV M3U playlist
+pydlp --import-m3u playlist.m3u
+```
+
+### 9. Audio/Video Enhancement & Hardware Transcoding
+```bash
+# EBU R128 loudness normalization and tempo increase
+pydlp --audio-loudnorm --audio-tempo 1.25 "https://example.com/podcast.mp3"
+
+# Denoise video and transcode with HEVC / H.265 using NVENC hardware acceleration
+pydlp --video-denoise --reencode-codec hevc --hardware-accel nvenc "https://example.com/video"
+```
+
+### 10. Web Studio Dashboard & REST API
+```bash
+# Start embedded Web UI on port 8000
 pydlp --serve --port 8000
 ```
 
 ---
 
-## 📦 Standalone Executable & Distribution
+## 🧪 Comprehensive Test Suite
 
-Py-dlp includes a self-contained ZipApp packaging tool that bundles the entire library and CLI into an executable single-file binary with zero dependencies:
+Py-dlp contains a complete unit and integration test suite executing 100% offline:
 
 ```bash
-# Generate standalone executable 'dist/pydlp'
-python3 bundle.py
+python3 -m unittest discover -s tests -v
+```
 
-# Run standalone binary directly anywhere with Python 3:
-./dist/pydlp --version
-./dist/pydlp "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-
-# Build all distribution artifacts (sdist, wheel, standalone binary):
-python3 devscripts/build_dist.py
+```
+Ran 89 tests in 2.29s — OK
 ```
 
 ---
 
-## 🧪 Running Tests
+## 📦 Standalone Single-File Binary & Distribution Build
+
+Build the standalone binary and package distributions with zero dependencies:
 
 ```bash
-# Run all 76 comprehensive unit & integration tests
-python3 -m unittest discover -s tests -v
+# 1. Build standalone executable (dist/pydlp)
+python3 bundle.py
+
+# 2. Build Python wheel (.whl) and source distribution (.tar.gz)
+python3 devscripts/build_dist.py
+
+# 3. Create full release package with checksums
+python3 devscripts/create_release.py 2026.09.04
 ```
 
 ---
 
 ## 📄 License
-MIT License. Free for personal, commercial, and open-source use.
+
+Py-dlp is licensed under the [MIT License](LICENSE).

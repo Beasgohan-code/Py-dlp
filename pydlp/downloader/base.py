@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, List, Optional
 from pydlp.core.exceptions import CancelRequested, DownloadError
 from pydlp.core.http import HttpClient
 from pydlp.core.progress import ProgressHookDispatcher, SpeedCalculator
+from pydlp.core.ratelimit import RateLimiter, parse_rate_limit
 from pydlp.core.types import DownloadProgress, MediaFormat, MediaInfo
 
 
@@ -22,6 +23,13 @@ class BaseDownloader(ABC):
         self.progress_dispatcher = ProgressHookDispatcher()
         self.speed_calc = SpeedCalculator()
         self._cancel_requested = False
+        rate_limit_val = parse_rate_limit(self.options.get("limit_rate") or self.options.get("ratelimit"))
+        self.rate_limiter = RateLimiter(rate_limit_val)
+
+    def throttle(self, bytes_transferred: int) -> None:
+        """Throttle transfer speed if rate limiting is enabled."""
+        if self.rate_limiter:
+            self.rate_limiter.throttle(bytes_transferred)
 
     def add_progress_hook(self, hook: Callable[[DownloadProgress], None]) -> None:
         self.progress_dispatcher.add_hook(hook)

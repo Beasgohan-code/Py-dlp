@@ -70,6 +70,23 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "cookies_from_browser": None,
     "geo_bypass": False,
     "geo_bypass_country": "US",
+    "interactive": False,
+    "notify_webhook": None,
+    "notify_discord": None,
+    "notify_telegram": None,
+    "watch": False,
+    "watch_interval": 60,
+    "proxy_pool": None,
+    "proxy_rotate": False,
+    "import_bookmarks": None,
+    "import_m3u": None,
+    "audio_loudnorm": False,
+    "audio_pitch": None,
+    "audio_tempo": None,
+    "video_speed": None,
+    "video_denoise": False,
+    "reencode_codec": None,
+    "hardware_accel": None,
 }
 
 
@@ -98,6 +115,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     gen_group.add_argument("--doctor", action="store_true", help="Run system diagnostics and check health of dependencies")
     gen_group.add_argument("--play", action="store_true", help="Stream video directly into external media player (mpv, vlc, ffplay)")
     gen_group.add_argument("--player", type=str, help="Specify player executable for direct streaming (e.g. mpv, vlc)")
+    gen_group.add_argument("-i", "--interactive", action="store_true", help="Interactively inspect and select streams/formats before downloading")
+    gen_group.add_argument("--import-bookmarks", type=str, help="Import and download URLs from browser HTML bookmarks file")
+    gen_group.add_argument("--import-m3u", type=str, help="Import and download stream URLs from .m3u/.m3u8 playlist file")
     gen_group.add_argument("--no-color", action="store_true", help="Disable colored terminal output")
 
     # Web Dashboard & Server
@@ -157,10 +177,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     sub_group.add_argument("--sub-format", dest="subtitlesformat", type=str, default="srt", help="Subtitle format, accepts srt/vtt/ass (default: srt)")
 
     # Post-processing Options
-    pp_group = parser.add_argument_group("Post-processing Options")
+    pp_group = parser.add_argument_group("Post-processing & Filter Options")
     pp_group.add_argument("-x", "--extract-audio", action="store_true", help="Convert video files to audio-only files")
     pp_group.add_argument("--audio-format", type=str, default="mp3", help="Specify audio format: 'mp3', 'aac', 'm4a', 'opus', 'flac', or 'wav' (default: mp3)")
     pp_group.add_argument("--audio-quality", type=str, default="192k", help="Specify ffmpeg audio quality (default: 192k)")
+    pp_group.add_argument("--audio-loudnorm", action="store_true", help="Apply EBU R128 loudness normalization")
+    pp_group.add_argument("--audio-pitch", type=float, help="Adjust audio pitch multiplier (e.g. 1.2 or 0.85)")
+    pp_group.add_argument("--audio-tempo", type=float, help="Adjust audio playback tempo/speed without changing pitch (e.g. 1.25)")
+    pp_group.add_argument("--video-speed", type=float, help="Adjust video speed multiplier (e.g. 1.5 or 0.75)")
+    pp_group.add_argument("--video-denoise", action="store_true", help="Apply high-quality 3D video denoising filter")
+    pp_group.add_argument("--reencode-codec", type=str, help="Re-encode output with codec (e.g. h264, hevc, av1, vp9, mp3, flac)")
+    pp_group.add_argument("--hardware-accel", type=str, help="Hardware acceleration backend (cuda, nvenc, vaapi, videotoolbox, qsv)")
     pp_group.add_argument("--add-metadata", action="store_true", help="Write metadata to the media file")
     pp_group.add_argument("--write-info-json", action="store_true", help="Write video metadata to a .info.json file")
     pp_group.add_argument("--write-chapters", action="store_true", help="Export video chapters to a JSON file")
@@ -171,9 +198,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
     fmt_group.add_argument("-f", "--format", type=str, default="bestvideo+bestaudio/best", help="Video format code (default: bestvideo+bestaudio/best)")
     fmt_group.add_argument("-F", "--list-formats", action="store_true", help="List available formats of each video")
 
+    # Continuous Watcher & Daemon
+    watch_group = parser.add_argument_group("Watcher & Daemon Options")
+    watch_group.add_argument("--watch", action="store_true", help="Continuously monitor and watch URLs/channels for new items")
+    watch_group.add_argument("--watch-interval", type=int, default=60, help="Interval in seconds between watcher poll cycles (default: 60)")
+
+    # Notifications & Webhooks
+    notify_group = parser.add_argument_group("Notification & Webhook Options")
+    notify_group.add_argument("--notify-webhook", type=str, help="Send HTTP POST webhook events on download progress and completion")
+    notify_group.add_argument("--notify-discord", type=str, help="Send Discord rich embed notification cards on download completion/failure")
+    notify_group.add_argument("--notify-telegram", type=str, help="Send Telegram notifications on download completion (TOKEN:CHAT_ID)")
+
     # Network Options
     net_group = parser.add_argument_group("Network Options")
     net_group.add_argument("--proxy", type=str, help="Use the specified HTTP/HTTPS/SOCKS proxy")
+    net_group.add_argument("--proxy-pool", type=str, help="File or comma-separated list of proxy servers to rotate through")
+    net_group.add_argument("--proxy-rotate", action="store_true", help="Enable automatic proxy rotation on failures")
     net_group.add_argument("--geo-bypass", action="store_true", help="Bypass geographic restriction via headers spoofing")
     net_group.add_argument("--geo-bypass-country", type=str, default="US", help="Country code for geo-bypass spoofing (default: US)")
     net_group.add_argument("--cookies-from-browser", type=str, help="Load cookies from browser (chrome, firefox, brave, edge, safari, opera, vivaldi)")

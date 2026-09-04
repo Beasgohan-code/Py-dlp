@@ -23,6 +23,7 @@ from pydlp.core.exceptions import (
 from pydlp.core.format_selector import FormatSelector
 from pydlp.core.http import HttpClient
 from pydlp.core.interactive import InteractiveSelector
+from pydlp.core.match_filter import MatchFilter
 from pydlp.core.notifications import NotificationManager
 from pydlp.core.plugins import get_custom_postprocessors, load_plugins_from_directory
 from pydlp.core.progress import (
@@ -46,6 +47,7 @@ from pydlp.postprocessor import (
     ChapterPostProcessor,
     CloudUploaderPostProcessor,
     FFmpegPostProcessor,
+    MediaEmbedderPostProcessor,
     MediaEnhancerPostProcessor,
     MetadataPostProcessor,
     SponsorBlockPostProcessor,
@@ -128,6 +130,15 @@ class PyDLP:
         # Notification Manager
         self.notifier = NotificationManager(self.params)
 
+        # Match Filter
+        self.match_filter = MatchFilter(
+            match_filter_str=self.params.get("match_filter"),
+            min_filesize=self.params.get("min_filesize"),
+            max_filesize=self.params.get("max_filesize"),
+            dateafter=self.params.get("dateafter"),
+            datebefore=self.params.get("datebefore"),
+        )
+
         # Built-in and custom post-processors
         self._postprocessors = [
             SubtitlePostProcessor(self.http, self.params),
@@ -142,6 +153,7 @@ class PyDLP:
             AISummaryPostProcessor(self.http, self.params),
             ChapterPostProcessor(self.params),
             FFmpegPostProcessor(self.params),
+            MediaEmbedderPostProcessor(self.params),
             CloudUploaderPostProcessor(self.params),
         ]
         # Append registered custom post-processors
@@ -227,6 +239,12 @@ class PyDLP:
             return info
 
         if self.params.get("simulate", False) or not download:
+            return info
+
+        # Check Match Filter
+        passes_match, filter_reason = self.match_filter.matches(info)
+        if not passes_match:
+            self._report_info(f"[{info.id}] Skipping video ({filter_reason})")
             return info
 
         # Process and download single video

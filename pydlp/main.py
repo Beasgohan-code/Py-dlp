@@ -19,11 +19,23 @@ def main(args: Optional[List[str]] = None) -> int:
     """Main CLI entrypoint."""
     parsed, opts = parse_cli_args(args)
 
-    # 1. Run Doctor / System Diagnostics if requested
+    # 1. Run Self-Updater if requested
+    if opts.get("update", False):
+        from pydlp.core.updater import SelfUpdater
+        return SelfUpdater(color=opts.get("color", True)).update()
+
+    # 2. Generate Shell Completion if requested
+    completion_shell = opts.get("generate_completion")
+    if completion_shell:
+        from pydlp.core.completion import generate_completion_script
+        print(generate_completion_script(completion_shell))
+        return 0
+
+    # 3. Run Doctor / System Diagnostics if requested
     if opts.get("doctor", False):
         return run_doctor()
 
-    # 2. Search Sites Catalog if requested
+    # 4. Search Sites Catalog if requested
     search_query = opts.get("search_sites")
     if search_query:
         catalog = get_platform_catalog()
@@ -41,7 +53,7 @@ def main(args: Optional[List[str]] = None) -> int:
             print(f"No exact matches found for '{search_query}'. The Universal Catalog Engine matches any standard media URL automatically.")
         return 0
 
-    # 3. Start Web Dashboard if requested
+    # 5. Start Web Dashboard if requested
     if opts.get("serve", False):
         from pydlp.server.app import run_server
         host = opts.get("host", "0.0.0.0")
@@ -49,7 +61,7 @@ def main(args: Optional[List[str]] = None) -> int:
         run_server(host=host, port=port)
         return 0
 
-    # 4. List Extractors if requested
+    # 6. List Extractors if requested
     if opts.get("list_extractors", False) or opts.get("listextractors", False):
         extractors = list_extractors()
         headers = ["EXTRACTOR NAME", "DESCRIPTION"]
@@ -58,7 +70,7 @@ def main(args: Optional[List[str]] = None) -> int:
         print(format_table(headers, rows))
         return 0
 
-    # 5. Check for input URLs, batch file, or bookmark/m3u imports
+    # 7. Check for input URLs, batch file, or bookmark/m3u imports
     urls = list(opts.get("urls", []))
     batch_file = opts.get("batchfile")
     if batch_file:
@@ -96,13 +108,13 @@ def main(args: Optional[List[str]] = None) -> int:
         parser.print_help()
         return 1
 
-    # 6. Check Browser Cookies
+    # 8. Check Browser Cookies
     browser = opts.get("cookies_from_browser")
     if browser:
         jar = BrowserCookieLoader.load_cookies(browser)
         opts["cookie_jar"] = jar
 
-    # 7. Check Direct Play Mode
+    # 9. Check Direct Play Mode
     if opts.get("play", False):
         from pydlp.core.stream_player import StreamPlayer
         engine = PyDLP(opts)
@@ -115,7 +127,7 @@ def main(args: Optional[List[str]] = None) -> int:
                 player.play(info, fmt)
         return 0
 
-    # 8. Check Watcher Daemon Mode
+    # 10. Check Watcher Daemon Mode
     if opts.get("watch", False):
         from pydlp.core.watcher import WatcherDaemon
         engine = PyDLP(opts)
@@ -123,7 +135,7 @@ def main(args: Optional[List[str]] = None) -> int:
         daemon.run()
         return 0
 
-    # 9. Instantiate PyDLP and run download
+    # 11. Instantiate PyDLP and run download
     try:
         engine = PyDLP(opts)
         exit_code = engine.download(urls)

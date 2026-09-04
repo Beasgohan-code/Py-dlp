@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Standard%20Library)-success.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
-[![Tests](https://img.shields.io/badge/tests-passing%20(98%2F98)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
+[![Tests](https://img.shields.io/badge/tests-passing%20(103%2F103)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 
 *A modular, blazing-fast, and complete media extraction and download engine engineered with zero required external dependencies, rich CLI formatting, Universal All-Rounder Downloader dispatch, HLS/DASH streaming, continuous live recording, SponsorBlock removal, AI transcript summarization, and a built-in modern Web Studio Dashboard.*
 
@@ -19,7 +19,15 @@
 
 ## 📥 Installation
 
-Install Py-dlp instantly using `pip`:
+### 1. Universal One-Line Installer
+Install Py-dlp automatically on Linux, macOS, or WSL:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Beasgohan-code/Py-dlp/main/install.sh | bash
+```
+
+### 2. Install via Pip
+Install Py-dlp instantly using standard `pip`:
 
 ```bash
 # Standard installation
@@ -33,6 +41,79 @@ pip install -e .
 ```
 
 Both `pydlp` and `py-dlp` CLI commands will be available globally on your system.
+
+### 3. Standalone Zero-Dependency Binary
+Download the pre-compiled, self-contained single-file executable directly without needing Python packages:
+
+```bash
+curl -L -o /usr/local/bin/pydlp https://github.com/Beasgohan-code/Py-dlp/releases/latest/download/pydlp
+chmod +x /usr/local/bin/pydlp
+```
+
+---
+
+## 🚀 Advanced Power Features & yt-dlp Parity
+
+### 🔄 Automatic Self-Updater (`-U`, `--update`)
+Upgrade Py-dlp to the latest release on PyPI or GitHub with one simple command:
+
+```bash
+# Check and auto-upgrade Py-dlp
+pydlp -U
+pydlp --update
+```
+
+### 📁 Hierarchical Configuration Files
+Py-dlp automatically discovers and loads configuration files from standard system locations:
+- **Linux/Unix**: `~/.config/pydlp/config` or `/etc/pydlp.conf`
+- **macOS**: `~/Library/Application Support/pydlp/config`
+- **Windows**: `%APPDATA%/pydlp/config.txt`
+- **Portable**: `./pydlp.conf` in current working directory
+
+Specify custom config files or ignore configs entirely:
+```bash
+# Load specific config
+pydlp --config-location /path/to/custom.conf https://youtu.be/...
+
+# Ignore all system and local configs
+pydlp --no-config https://youtu.be/...
+```
+
+### 🎯 Dynamic Match Filters & Date Expressions (`--match-filter`)
+Filter downloads dynamically based on metadata attributes, duration, views, live status, filesize, and upload dates:
+
+```bash
+# Download only videos over 1 minute with at least 1,000 views that are not live streams
+pydlp --match-filter "duration > 60 & view_count >= 1000 & !is_live" "https://www.youtube.com/playlist?list=..."
+
+# Filter by filesize range
+pydlp --min-filesize 10M --max-filesize 500M "https://www.youtube.com/playlist?list=..."
+
+# Filter by upload date bounds (YYYYMMDD)
+pydlp --dateafter 20260101 --datebefore 20260901 "https://www.youtube.com/playlist?list=..."
+```
+
+### 📦 Media Container Embedding (`--embed-*`)
+Mux subtitles, thumbnail cover art, chapter markers, and metadata tags directly into output MP4, MKV, MP3, or FLAC files:
+
+```bash
+# Embed soft subtitles, cover art, chapters, and metadata tags
+pydlp --write-subs --embed-subs --embed-thumbnail --embed-metadata --embed-chapters https://youtu.be/dQw4w9WgXcQ
+```
+
+### 🐚 Shell Tab-Completion Scripts (`--generate-completion`)
+Generate tab-completion scripts for Bash, Zsh, or Fish shells:
+
+```bash
+# Bash completion
+pydlp --generate-completion bash >> ~/.bashrc
+
+# Zsh completion
+pydlp --generate-completion zsh > ~/.zsh/_pydlp
+
+# Fish completion
+pydlp --generate-completion fish > ~/.config/fish/completions/pydlp.fish
+```
 
 ---
 

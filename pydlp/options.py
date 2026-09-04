@@ -96,6 +96,19 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "ai_transcribe": False,
     "ai_transcribe_model": "base",
     "swarm_nodes": None,
+    "update": False,
+    "config_location": None,
+    "ignore_config": False,
+    "match_filter": None,
+    "min_filesize": None,
+    "max_filesize": None,
+    "dateafter": None,
+    "datebefore": None,
+    "embed_thumbnail": False,
+    "embed_metadata": False,
+    "embed_subs": False,
+    "embed_chapters": False,
+    "generate_completion": None,
 }
 
 
@@ -113,6 +126,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     # General options
     gen_group = parser.add_argument_group("General Options")
     gen_group.add_argument("-v", "--version", action="version", version=f"pydlp {__version__}")
+    gen_group.add_argument("-U", "--update", action="store_true", help="Update this program to the latest version")
+    gen_group.add_argument("--config-location", type=str, help="Location of the configuration file")
+    gen_group.add_argument("--no-config", "--ignore-config", dest="ignore_config", action="store_true", help="Do not load any configuration files")
+    gen_group.add_argument("--generate-completion", type=str, choices=["bash", "zsh", "fish"], help="Generate shell auto-completion script and exit")
     gen_group.add_argument("--verbose", action="store_true", help="Print debug information")
     gen_group.add_argument("-q", "--quiet", action="store_true", help="Activate quiet mode (hide progress and notices)")
     gen_group.add_argument("--no-warnings", action="store_true", help="Ignore warnings")
@@ -142,6 +159,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     sel_group.add_argument("--playlist-items", type=str, help="Playlist video items to download (e.g. 1,2,5-8)")
     sel_group.add_argument("--no-playlist", action="store_true", help="Download only the video, if the URL refers to a video and a playlist")
     sel_group.add_argument("--download-archive", type=str, help="Download only videos not listed in the archive file")
+    sel_group.add_argument("--match-filter", type=str, help="Generic video filter expression (e.g. 'duration > 60 & view_count >= 1000')")
+    sel_group.add_argument("--min-filesize", type=str, help="Do not download any videos smaller than SIZE (e.g. 50k or 44.6m)")
+    sel_group.add_argument("--max-filesize", type=str, help="Do not download any videos larger than SIZE (e.g. 50k or 44.6m)")
+    sel_group.add_argument("--dateafter", type=str, help="Download only videos uploaded on or after this date (YYYYMMDD)")
+    sel_group.add_argument("--datebefore", type=str, help="Download only videos uploaded on or before this date (YYYYMMDD)")
 
     # Download Options
     dl_group = parser.add_argument_group("Download Options")
@@ -202,7 +224,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     pp_group.add_argument("--video-denoise", action="store_true", help="Apply high-quality 3D video denoising filter")
     pp_group.add_argument("--reencode-codec", type=str, help="Re-encode output with codec (e.g. h264, hevc, av1, vp9, mp3, flac)")
     pp_group.add_argument("--hardware-accel", type=str, help="Hardware acceleration backend (cuda, nvenc, vaapi, videotoolbox, qsv)")
-    pp_group.add_argument("--add-metadata", action="store_true", help="Write metadata to the media file")
+    pp_group.add_argument("--embed-subs", "--embed-subtitles", dest="embed_subs", action="store_true", help="Embed subtitles into video container (mp4, mkv)")
+    pp_group.add_argument("--embed-thumbnail", action="store_true", help="Embed thumbnail image into video/audio container as cover art")
+    pp_group.add_argument("--embed-metadata", "--add-metadata", dest="embed_metadata", action="store_true", help="Write and embed metadata tags into the media file")
+    pp_group.add_argument("--embed-chapters", action="store_true", help="Embed chapter markers into the video container")
     pp_group.add_argument("--write-info-json", action="store_true", help="Write video metadata to a .info.json file")
     pp_group.add_argument("--write-chapters", action="store_true", help="Export video chapters to a JSON file")
     pp_group.add_argument("--ffmpeg-location", type=str, help="Path to the ffmpeg binary")
@@ -252,9 +277,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def parse_cli_args(args: Optional[List[str]] = None) -> Tuple[argparse.Namespace, Dict[str, Any]]:
-    """Parses command line arguments and merges them with defaults."""
+    """Parses command line arguments and merges them with defaults and configuration files."""
+    from pydlp.core.config import ConfigFileParser
+
+    raw_args = list(args) if args is not None else sys.argv[1:]
+
+    # Check for config bypass or custom location
+    ignore_config = "--no-config" in raw_args or "--ignore-config" in raw_args
+    custom_config = None
+    for i, a in enumerate(raw_args):
+        if a == "--config-location" and i + 1 < len(raw_args):
+            custom_config = raw_args[i + 1]
+            break
+
+    config_args = ConfigFileParser.load_config_args(custom_config, ignore_config=ignore_config)
+    combined_args = config_args + raw_args
+
     parser = build_arg_parser()
-    parsed = parser.parse_args(args)
+    parsed = parser.parse_args(combined_args)
 
     opts = dict(DEFAULT_OPTIONS)
     opts.update(vars(parsed))

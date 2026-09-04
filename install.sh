@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Py-dlp Universal One-Line Installer Script
+# install.sh - Universal One-Line Installer Script for Linux, macOS, WSL
 # Usage: curl -fsSL https://raw.githubusercontent.com/Beasgohan-code/Py-dlp/main/install.sh | bash
 
 set -e
@@ -16,25 +16,27 @@ else
     exit 1
 fi
 
-# Try pip install
-if command -v pip3 >/dev/null 2>&1 || command -v pip >/dev/null 2>&1; then
-    echo "✓ Installing py-dlp via pip..."
-    $PYTHON_BIN -m pip install --upgrade py-dlp 2>/dev/null || $PYTHON_BIN -m pip install --upgrade py-dlp --break-system-packages 2>/dev/null || $PYTHON_BIN -m pip install --user --upgrade py-dlp || {
-        INSTALL_DIR="${HOME}/.local/bin"
-        mkdir -p "$INSTALL_DIR"
-        echo "✓ Downloading standalone Py-dlp binary into $INSTALL_DIR..."
-        curl -fsSL -o "${INSTALL_DIR}/pydlp" "https://github.com/Beasgohan-code/Py-dlp/releases/latest/download/pydlp" || true
-        chmod +x "${INSTALL_DIR}/pydlp" 2>/dev/null || true
-        ln -sf "${INSTALL_DIR}/pydlp" "${INSTALL_DIR}/py-dlp" 2>/dev/null || true
-    }
+# Try pip install from git
+echo "✓ Installing py-dlp..."
+if $PYTHON_BIN -m pip install --upgrade git+https://github.com/Beasgohan-code/Py-dlp.git 2>/dev/null || \
+   $PYTHON_BIN -m pip install --upgrade --break-system-packages git+https://github.com/Beasgohan-code/Py-dlp.git 2>/dev/null || \
+   $PYTHON_BIN -m pip install --user --upgrade git+https://github.com/Beasgohan-code/Py-dlp.git 2>/dev/null; then
+    echo "✓ Py-dlp installed via pip!"
 else
     # Fallback to standalone binary download
     INSTALL_DIR="${HOME}/.local/bin"
     mkdir -p "$INSTALL_DIR"
     echo "✓ Downloading standalone Py-dlp binary into $INSTALL_DIR..."
-    curl -fsSL -o "${INSTALL_DIR}/pydlp" "https://github.com/Beasgohan-code/Py-dlp/releases/latest/download/pydlp"
-    chmod +x "${INSTALL_DIR}/pydlp"
-    ln -sf "${INSTALL_DIR}/pydlp" "${INSTALL_DIR}/py-dlp"
+    curl -fsSL -o "${INSTALL_DIR}/pydlp" "https://raw.githubusercontent.com/Beasgohan-code/Py-dlp/main/dist/pydlp" || true
+    chmod +x "${INSTALL_DIR}/pydlp" 2>/dev/null || true
+    ln -sf "${INSTALL_DIR}/pydlp" "${INSTALL_DIR}/py-dlp" 2>/dev/null || true
+fi
+
+# Ensure ~/.local/bin is in PATH
+if [ -d "${HOME}/.local/bin" ] && [[ ":$PATH:" != *":${HOME}/.local/bin:"* ]]; then
+    export PATH="${HOME}/.local/bin:${PATH}"
+    echo 'export PATH="${HOME}/.local/bin:${PATH}"' >> "${HOME}/.bashrc"
+    [ -f "${HOME}/.zshrc" ] && echo 'export PATH="${HOME}/.local/bin:${PATH}"' >> "${HOME}/.zshrc"
 fi
 
 echo "✓ Py-dlp installed successfully!"

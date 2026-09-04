@@ -11,38 +11,59 @@ from pydlp.core.http import HttpClient
 from pydlp.extractor.abema import AbemaIE
 from pydlp.extractor.animepahe import AnimePaheIE
 from pydlp.extractor.aniwave import AniwaveIE
+from pydlp.extractor.applepodcasts import ApplePodcastsIE
 from pydlp.extractor.archiveorg import ArchiveOrgIE
 from pydlp.extractor.audiomack import AudiomackIE
 from pydlp.extractor.bandcamp import BandcampIE
 from pydlp.extractor.base import InfoExtractor
+from pydlp.extractor.beeg import BeegIE
 from pydlp.extractor.bilibili import BilibiliIE
+from pydlp.extractor.bitchute import BitChuteIE
 from pydlp.extractor.bluesky import BlueskyIE
 from pydlp.extractor.brightcove import BrightcoveIE
+from pydlp.extractor.camsoda import CamSodaIE
 from pydlp.extractor.chaturbate import ChaturbateIE
+from pydlp.extractor.coub import CoubIE
 from pydlp.extractor.crunchyroll import CrunchyrollIE
+from pydlp.extractor.cumlouder import CumlouderIE
 from pydlp.extractor.dailymotion import DailymotionIE
 from pydlp.extractor.deezer import DeezerIE
 from pydlp.extractor.doodstream import DoodStreamIE
 from pydlp.extractor.douyin import DouyinIE
+from pydlp.extractor.dtube import DTubeIE
 from pydlp.extractor.eporner import EpornerIE
 from pydlp.extractor.facebook import FacebookIE
+from pydlp.extractor.fapello import FapelloIE
 from pydlp.extractor.filemoon import FilemoonIE
+from pydlp.extractor.freesound import FreesoundIE
 from pydlp.extractor.gdrive import GDriveIE
 from pydlp.extractor.generic import GenericIE
+from pydlp.extractor.giphy import GiphyIE
 from pydlp.extractor.gogoanime import GogoAnimeIE
+from pydlp.extractor.hanime import HanimeIE
+from pydlp.extractor.hentaihaven import HentaiHavenIE
 from pydlp.extractor.hqporner import HQPornerIE
+from pydlp.extractor.imgur import ImgurIE
 from pydlp.extractor.instagram import InstagramIE
 from pydlp.extractor.jwplayer import JWPlayerIE
 from pydlp.extractor.kick import KickIE
+from pydlp.extractor.likee import LikeeIE
+from pydlp.extractor.linkedin import LinkedInIE
 from pydlp.extractor.loom import LoomIE
+from pydlp.extractor.manyvids import ManyVidsIE
+from pydlp.extractor.mediafire import MediaFireIE
 from pydlp.extractor.mixcloud import MixcloudIE
 from pydlp.extractor.mixdrop import MixdropIE
+from pydlp.extractor.motherless import MotherlessIE
 from pydlp.extractor.nebula import NebulaIE
 from pydlp.extractor.niconico import NiconicoIE
+from pydlp.extractor.ninegag import NineGagIE
+from pydlp.extractor.odysee import OdyseeIE
 from pydlp.extractor.peertube import PeerTubeIE
 from pydlp.extractor.pinterest import PinterestIE
 from pydlp.extractor.podcast import PodcastIE
 from pydlp.extractor.pornhub import PornhubIE
+from pydlp.extractor.porntrex import PornTrexIE
 from pydlp.extractor.reddit import RedditIE
 from pydlp.extractor.redtube import RedTubeIE
 from pydlp.extractor.rule34video import Rule34VideoIE
@@ -53,32 +74,59 @@ from pydlp.extractor.spotify import SpotifyIE
 from pydlp.extractor.streamable import StreamableIE
 from pydlp.extractor.streamsb import StreamSBIE
 from pydlp.extractor.streamtape import StreamtapeIE
+from pydlp.extractor.ted import TedIE
 from pydlp.extractor.threads import ThreadsIE
+from pydlp.extractor.thumbzilla import ThumbzillaIE
+from pydlp.extractor.tidal import TidalIE
 from pydlp.extractor.tiktok import TikTokIE
+from pydlp.extractor.tnaflix import TnaFlixIE
+from pydlp.extractor.tube8 import Tube8IE
 from pydlp.extractor.twitch import TwitchIE
 from pydlp.extractor.twitter import TwitterIE
+from pydlp.extractor.vidyard import VidyardIE
 from pydlp.extractor.vimeo import VimeoIE
+from pydlp.extractor.vk import VKIE
 from pydlp.extractor.voe import VoeIE
 from pydlp.extractor.wistia import WistiaIE
+from pydlp.extractor.xhamster import XHamsterIE
 from pydlp.extractor.xvideos import XVideosIE
+from pydlp.extractor.youjizz import YouJizzIE
 from pydlp.extractor.youtube import YoutubeIE, YoutubePlaylistIE, YoutubeSearchIE
 
 _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
+    # YouTube & Major
     YoutubePlaylistIE,
     YoutubeSearchIE,
     YoutubeIE,
+    # Anime
     AnimePaheIE,
     CrunchyrollIE,
     AniwaveIE,
     GogoAnimeIE,
+    HentaiHavenIE,
+    HanimeIE,
+    # Adult Sites & Networks
     PornhubIE,
     XVideosIE,
+    XHamsterIE,
     SpankBangIE,
     RedTubeIE,
+    YouJizzIE,
     EpornerIE,
+    MotherlessIE,
+    BeegIE,
+    Tube8IE,
+    TnaFlixIE,
+    PornTrexIE,
+    ThumbzillaIE,
+    ManyVidsIE,
+    FapelloIE,
+    CumlouderIE,
     ChaturbateIE,
+    CamSodaIE,
     Rule34VideoIE,
     HQPornerIE,
+    # Video Hosts & Cyberlockers
     StreamtapeIE,
     MixdropIE,
     DoodStreamIE,
@@ -86,6 +134,8 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     FilemoonIE,
     StreamSBIE,
     GDriveIE,
+    MediaFireIE,
+    # Global Streaming & Live
     KickIE,
     NiconicoIE,
     AbemaIE,
@@ -95,27 +145,45 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     BrightcoveIE,
     JWPlayerIE,
     NebulaIE,
+    OdyseeIE,
+    BitChuteIE,
+    DTubeIE,
+    VKIE,
+    VidyardIE,
+    TedIE,
+    # Mainstream Social Media
     VimeoIE,
     TikTokIE,
     InstagramIE,
     TwitterIE,
     RedditIE,
     TwitchIE,
-    SoundCloudIE,
-    SpotifyIE,
-    DeezerIE,
-    MixcloudIE,
-    AudiomackIE,
-    BilibiliIE,
-    RumbleIE,
-    DailymotionIE,
-    FacebookIE,
     PinterestIE,
     ThreadsIE,
     BlueskyIE,
     StreamableIE,
+    LikeeIE,
+    LinkedInIE,
+    ImgurIE,
+    GiphyIE,
+    NineGagIE,
+    CoubIE,
+    # Music & Audio
+    SoundCloudIE,
+    SpotifyIE,
+    DeezerIE,
+    ApplePodcastsIE,
+    TidalIE,
+    MixcloudIE,
+    AudiomackIE,
     BandcampIE,
+    FreesoundIE,
     PodcastIE,
+    # Federated & Historical
+    BilibiliIE,
+    RumbleIE,
+    DailymotionIE,
+    FacebookIE,
     ArchiveOrgIE,
     PeerTubeIE,
     GenericIE,  # Must be last as fallback
@@ -156,60 +224,6 @@ def find_extractor_for_url(
 __all__ = [
     "InfoExtractor",
     "GenericIE",
-    "YoutubeIE",
-    "YoutubePlaylistIE",
-    "YoutubeSearchIE",
-    "AnimePaheIE",
-    "CrunchyrollIE",
-    "AniwaveIE",
-    "GogoAnimeIE",
-    "PornhubIE",
-    "XVideosIE",
-    "SpankBangIE",
-    "RedTubeIE",
-    "EpornerIE",
-    "ChaturbateIE",
-    "Rule34VideoIE",
-    "HQPornerIE",
-    "StreamtapeIE",
-    "MixdropIE",
-    "DoodStreamIE",
-    "VoeIE",
-    "FilemoonIE",
-    "StreamSBIE",
-    "GDriveIE",
-    "KickIE",
-    "NiconicoIE",
-    "AbemaIE",
-    "DouyinIE",
-    "LoomIE",
-    "WistiaIE",
-    "BrightcoveIE",
-    "JWPlayerIE",
-    "NebulaIE",
-    "VimeoIE",
-    "TikTokIE",
-    "InstagramIE",
-    "TwitterIE",
-    "RedditIE",
-    "TwitchIE",
-    "SoundCloudIE",
-    "SpotifyIE",
-    "DeezerIE",
-    "MixcloudIE",
-    "AudiomackIE",
-    "BilibiliIE",
-    "RumbleIE",
-    "DailymotionIE",
-    "FacebookIE",
-    "PinterestIE",
-    "ThreadsIE",
-    "BlueskyIE",
-    "StreamableIE",
-    "BandcampIE",
-    "PodcastIE",
-    "ArchiveOrgIE",
-    "PeerTubeIE",
     "list_extractors",
     "get_extractor_by_name",
     "find_extractor_for_url",

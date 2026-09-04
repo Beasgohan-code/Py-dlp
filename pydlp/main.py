@@ -5,8 +5,11 @@ from __future__ import annotations
 import sys
 from typing import List, Optional
 
+from pydlp.core.browser_cookies import BrowserCookieLoader
+from pydlp.core.doctor import run_doctor
 from pydlp.core.progress import TerminalColors, colorize, format_table
 from pydlp.extractor import list_extractors
+from pydlp.extractor.sites_db import get_platform_catalog
 from pydlp.options import build_arg_parser, parse_cli_args
 from pydlp.pydlp import PyDLP
 from pydlp.version import __version__
@@ -16,7 +19,29 @@ def main(args: Optional[List[str]] = None) -> int:
     """Main CLI entrypoint."""
     parsed, opts = parse_cli_args(args)
 
-    # 1. Start Web Dashboard if requested
+    # 1. Run Doctor / System Diagnostics if requested
+    if opts.get("doctor", False):
+        return run_doctor()
+
+    # 2. Search Sites Catalog if requested
+    search_query = opts.get("search_sites")
+    if search_query:
+        catalog = get_platform_catalog()
+        matches = []
+        q = search_query.lower().strip()
+        for domain, info in catalog.items():
+            if q in domain.lower() or q in info.get("desc", "").lower() or q in info.get("category", "").lower():
+                matches.append([domain, info.get("category", ""), info.get("desc", "")])
+
+        headers = ["PLATFORM", "CATEGORY", "DESCRIPTION"]
+        print(colorize(f"Py-dlp Universal Catalog Results for '{search_query}' ({len(matches)} matches):", TerminalColors.BOLD, opts.get("color", True)))
+        if matches:
+            print(format_table(headers, matches))
+        else:
+            print(f"No exact matches found for '{search_query}'. The Universal Catalog Engine matches any standard media URL automatically.")
+        return 0
+
+    # 3. Start Web Dashboard if requested
     if opts.get("serve", False):
         from pydlp.server.app import run_server
         host = opts.get("host", "0.0.0.0")
@@ -24,7 +49,7 @@ def main(args: Optional[List[str]] = None) -> int:
         run_server(host=host, port=port)
         return 0
 
-    # 2. List Extractors if requested
+    # 4. List Extractors if requested
     if opts.get("list_extractors", False) or opts.get("listextractors", False):
         extractors = list_extractors()
         headers = ["EXTRACTOR NAME", "DESCRIPTION"]
@@ -33,7 +58,7 @@ def main(args: Optional[List[str]] = None) -> int:
         print(format_table(headers, rows))
         return 0
 
-    # 3. Check for input URLs or batch file
+    # 5. Check for input URLs or batch file
     urls = list(opts.get("urls", []))
     batch_file = opts.get("batchfile")
     if batch_file:
@@ -56,7 +81,26 @@ def main(args: Optional[List[str]] = None) -> int:
         parser.print_help()
         return 1
 
-    # 4. Instantiate PyDLP and run
+    # 6. Check Browser Cookies
+    browser = opts.get("cookies_from_browser")
+    if browser:
+        jar = BrowserCookieLoader.load_cookies(browser)
+        opts["cookie_jar"] = jar
+
+    # 7. Check Direct Play Mode
+    if opts.get("play", False):
+        from pydlp.core.stream_player import StreamPlayer
+        engine = PyDLP(opts)
+        player = StreamPlayer(opts.get("player"))
+        for url in urls:
+            info = engine.extract_info(url, download=False)
+            if info and info.formats:
+                selected_fmts = engine.format_selector.select_formats(info)
+                fmt = selected_fmts[0] if selected_fmts else info.formats[0]
+                player.play(info, fmt)
+        return 0
+
+    # 8. Instantiate PyDLP and run download
     try:
         engine = PyDLP(opts)
         exit_code = engine.download(urls)

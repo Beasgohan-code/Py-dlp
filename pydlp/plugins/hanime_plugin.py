@@ -1,5 +1,5 @@
 """Hanime.tv Pro Plugin for Py-dlp.
-Provides high-definition stream extraction, series playlist enumeration, and rich metadata.
+Provides high-definition stream extraction, series playlist enumeration, rich metadata, and search queries.
 """
 
 from __future__ import annotations
@@ -10,9 +10,69 @@ from typing import Any, Dict, List, Optional
 
 from pydlp.core.exceptions import ExtractorError
 from pydlp.core.plugins import register_extractor
-from pydlp.core.types import MediaFormat, MediaInfo, MediaSubtitle, MediaThumbnail
+from pydlp.core.types import MediaChapter, MediaFormat, MediaInfo, MediaSubtitle, MediaThumbnail
 from pydlp.core.utils import int_or_none, parse_duration, str_or_none
 from pydlp.extractor.base import InfoExtractor
+
+
+@register_extractor
+class HanimeSearchPluginIE(InfoExtractor):
+    """Search query extractor for Hanime.tv (hanimesearch:query or hanimesearch5:query)."""
+
+    IE_NAME = "hanime:search"
+    IE_DESC = "Hanime.tv Search Queries"
+    _VALID_URL = r"hanimesearch(?P<count>\d+)?:\s*(?P<query>.+)"
+
+    def _real_extract(self, url: str) -> MediaInfo:
+        m = re.match(self._VALID_URL, url)
+        count = int(m.group("count") or 10) if m else 10
+        query = m.group("query").strip() if m else ""
+
+        search_url = f"https://search.htv-services.com/"
+        headers = {"Content-Type": "application/json;charset=UTF-8"}
+        payload = {
+            "search_text": query,
+            "tags": [],
+            "tags_mode": "AND",
+            "brands": [],
+            "blacklist": [],
+            "order_by": "created_at_unix",
+            "ordering": "desc",
+            "page": 0,
+        }
+
+        try:
+            resp = self.http.post(search_url, headers=headers, data=payload)
+            data = resp.json()
+            hits = json.loads(data.get("hits", "[]"))
+        except Exception:
+            hits = []
+
+        entries = []
+        for hit in hits[:count]:
+            slug = hit.get("slug")
+            if slug:
+                entries.append(
+                    MediaInfo(
+                        id=slug,
+                        title=hit.get("name", slug),
+                        webpage_url=f"https://hanime.tv/videos/hentai/{slug}",
+                        thumbnail=hit.get("cover_url"),
+                        uploader=hit.get("brand"),
+                        view_count=hit.get("views"),
+                        extractor="hanime_pro_plugin",
+                        extractor_key="hanime_pro_plugin",
+                    )
+                )
+
+        return MediaInfo(
+            id=f"hanimesearch_{query}",
+            title=f"Hanime Search: {query}",
+            webpage_url=f"https://hanime.tv/search?q={query}",
+            extractor=self.IE_NAME,
+            extractor_key=self.ie_key(),
+            entries=entries,
+        )
 
 
 @register_extractor
@@ -22,8 +82,6 @@ class HanimePluginIE(InfoExtractor):
     IE_NAME = "hanime_pro_plugin"
     IE_DESC = "Hanime.tv Pro Plugin (API v8, 1080p HLS/MP4, series playlists)"
     _VALID_URL = r"https?://(?:www\.)?hanime\.tv/(?:videos/hentai/|playlists/|hentai-videos/)(?P<id>[a-zA-Z0-9_-]+)"
-
-    API_BASE = "https://hw.hanime.tv/api/v8/video"
 
     def _real_extract(self, url: str) -> MediaInfo:
         slug = self._match_id(url)
@@ -44,7 +102,7 @@ class HanimePluginIE(InfoExtractor):
         likes = None
         release_date = None
 
-        # 1. Parse window.__NUXT__ or embedded state
+        # 1. Parse window.__NUXT__ state
         nuxt_match = re.search(r'window\.__NUXT__\s*=\s*(\{.+?\});\s*</script>', webpage)
         if nuxt_match:
             try:
@@ -61,7 +119,7 @@ class HanimePluginIE(InfoExtractor):
                 likes = int_or_none(video.get("likes"))
                 release_date = video.get("released_at")
 
-                # Manifest servers
+                # Parse server manifests
                 for server in video.get("videos_manifest", {}).get("servers", []):
                     server_name = server.get("name", "server")
                     for stream in server.get("streams", []):

@@ -63,6 +63,13 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "batchfile": None,
     "live_record_duration": None,
     "external_downloader": None,
+    "doctor": False,
+    "search_sites": None,
+    "play": False,
+    "player": None,
+    "cookies_from_browser": None,
+    "geo_bypass": False,
+    "geo_bypass_country": "US",
 }
 
 
@@ -87,6 +94,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     gen_group.add_argument("-j", "--dump-json", action="store_true", help="Quiet, but print JSON information for each video")
     gen_group.add_argument("-J", "--dump-single-json", action="store_true", help="Quiet, but print JSON information for each URL or playlist")
     gen_group.add_argument("--list-extractors", action="store_true", help="List all supported extractors and exit")
+    gen_group.add_argument("--search-sites", type=str, help="Search across 2,000+ indexed domains and platforms")
+    gen_group.add_argument("--doctor", action="store_true", help="Run system diagnostics and check health of dependencies")
+    gen_group.add_argument("--play", action="store_true", help="Stream video directly into external media player (mpv, vlc, ffplay)")
+    gen_group.add_argument("--player", type=str, help="Specify player executable for direct streaming (e.g. mpv, vlc)")
     gen_group.add_argument("--no-color", action="store_true", help="Disable colored terminal output")
 
     # Web Dashboard & Server
@@ -163,6 +174,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     # Network Options
     net_group = parser.add_argument_group("Network Options")
     net_group.add_argument("--proxy", type=str, help="Use the specified HTTP/HTTPS/SOCKS proxy")
+    net_group.add_argument("--geo-bypass", action="store_true", help="Bypass geographic restriction via headers spoofing")
+    net_group.add_argument("--geo-bypass-country", type=str, default="US", help="Country code for geo-bypass spoofing (default: US)")
+    net_group.add_argument("--cookies-from-browser", type=str, help="Load cookies from browser (chrome, firefox, brave, edge, safari, opera, vivaldi)")
     net_group.add_argument("--socket-timeout", type=float, default=15.0, help="Time to wait before giving up, in seconds")
     net_group.add_argument("--user-agent", type=str, help="Specify a custom user agent")
     net_group.add_argument("--referer", type=str, help="Specify a custom referer")

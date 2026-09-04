@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Standard%20Library)-success.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
-[![Tests](https://img.shields.io/badge/tests-passing%20(109%2F109)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
+[![Tests](https://img.shields.io/badge/tests-passing%20(113%2F113)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 
 *A modular, blazing-fast, and complete media extraction and download engine engineered with zero required external dependencies, rich CLI formatting, Universal All-Rounder Downloader dispatch, HLS/DASH streaming, continuous live recording, SponsorBlock removal, AI transcript summarization, and a built-in modern Web Studio Dashboard.*
 
@@ -19,14 +19,38 @@
 
 ## 📥 Installation
 
-### 1. Universal One-Line Installer
+### 1. 📱 Android (Termux) Installation & Setup
+To install and set up Py-dlp on Android using **Termux** in one command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Beasgohan-code/Py-dlp/main/install-termux.sh | bash
+```
+
+Or manually inside Termux:
+```bash
+# 1. Update packages and install Python + FFmpeg
+pkg update && pkg install -y python ffmpeg curl
+
+# 2. Install Py-dlp
+pip install py-dlp
+
+# 3. Configure storage and Android Share Sheet integration
+pydlp --setup-termux
+```
+
+> **🔥 Android Share Sheet Integration:**
+> After running `pydlp --setup-termux`, you can tap **"Share"** on any video in the **YouTube**, **TikTok**, **Instagram**, or **Twitter/X** Android apps and choose **Termux**. Py-dlp will automatically download the media straight to your phone's `Download` folder!
+
+---
+
+### 2. Universal One-Line Installer (Linux, macOS, WSL)
 Install Py-dlp automatically on Linux, macOS, or WSL:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Beasgohan-code/Py-dlp/main/install.sh | bash
 ```
 
-### 2. Install via Pip
+### 3. Install via Pip
 Install Py-dlp instantly using standard `pip`:
 
 ```bash
@@ -42,7 +66,7 @@ pip install -e .
 
 Both `pydlp` and `py-dlp` CLI commands will be available globally on your system.
 
-### 3. Standalone Zero-Dependency Binary
+### 4. Standalone Zero-Dependency Binary
 Download the pre-compiled, self-contained single-file executable directly without needing Python packages:
 
 ```bash

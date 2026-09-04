@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import platform
 import shutil
 import ssl
@@ -23,6 +24,19 @@ def run_doctor() -> int:
     py_ver = platform.python_version()
     print(f"  ✓ Python Version:      {py_ver} ({platform.python_implementation()})")
     print(f"  ✓ Operating System:    {platform.system()} {platform.release()} ({platform.machine()})")
+
+    # Termux Diagnostics
+    from pydlp.core.termux import is_termux, get_termux_download_dir
+    if is_termux():
+        termux_ver = os.environ.get("TERMUX_VERSION", "Active")
+        print(f"  ✓ Termux Environment: Active (Version: {termux_ver})")
+        dl_dir = get_termux_download_dir()
+        print(f"  ✓ Termux Storage:      {dl_dir}")
+        t_api = shutil.which("termux-notification")
+        if t_api:
+            print(f"  ✓ Termux API:          Available ({t_api})")
+        else:
+            print("  ! Termux API:          Not installed (install 'pkg install termux-api' for Android notifications)")
 
     # 2. OpenSSL & TLS
     try:

@@ -257,6 +257,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     notify_group.add_argument("--notify-webhook", type=str, help="Send HTTP POST webhook events on download progress and completion")
     notify_group.add_argument("--notify-discord", type=str, help="Send Discord rich embed notification cards on download completion/failure")
     notify_group.add_argument("--notify-telegram", type=str, help="Send Telegram notifications on download completion (TOKEN:CHAT_ID)")
+    notify_group.add_argument("--notify-termux", action="store_true", default=True, help="Send native Android Termux push notifications")
+    notify_group.add_argument("--setup-termux", action="store_true", help="Auto-configure Android Termux permissions, share-sheet url-opener, and storage paths")
 
     # Network Options
     net_group = parser.add_argument_group("Network Options")

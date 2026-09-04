@@ -17,17 +17,19 @@ logger = logging.getLogger("pydlp.notifications")
 
 
 class NotificationManager:
-    """Manages notifications dispatched to Discord, Telegram, or custom Webhooks."""
+    """Manages notifications dispatched to Discord, Telegram, Termux, or custom Webhooks."""
 
     def __init__(self, options: Optional[Dict[str, Any]] = None):
         self.options = options or {}
         self.webhook_url = self.options.get("notify_webhook")
         self.discord_url = self.options.get("notify_discord")
         self.telegram_target = self.options.get("notify_telegram")  # Format: "BOT_TOKEN:CHAT_ID"
+        self.notify_termux = self.options.get("notify_termux", True)
 
     @property
     def is_enabled(self) -> bool:
-        return bool(self.webhook_url or self.discord_url or self.telegram_target)
+        from pydlp.core.termux import is_termux
+        return bool(self.webhook_url or self.discord_url or self.telegram_target or (self.notify_termux and is_termux()))
 
     def notify_download_start(self, info: MediaInfo) -> None:
         if not self.is_enabled:
@@ -36,6 +38,11 @@ class NotificationManager:
         title = info.title or "Unknown Title"
         uploader = info.uploader or "Unknown Uploader"
         duration = format_seconds(info.duration) if info.duration else "Unknown"
+
+        # Termux Native Notification
+        if self.notify_termux:
+            from pydlp.core.termux import send_termux_notification
+            send_termux_notification("Download Started", f"{title} ({uploader})", priority="low")
 
         # Discord
         if self.discord_url:
@@ -78,6 +85,11 @@ class NotificationManager:
         duration = format_seconds(info.duration) if info.duration else "Unknown"
         size_str = format_bytes(total_bytes) if total_bytes else "Unknown"
         time_str = f"{elapsed_seconds:.1f}s"
+
+        # Termux Native Notification
+        if self.notify_termux:
+            from pydlp.core.termux import send_termux_notification
+            send_termux_notification("Download Complete", f"{title}\nSaved: {size_str} in {time_str}")
 
         # Discord Embed
         if self.discord_url:
@@ -126,6 +138,11 @@ class NotificationManager:
             return
 
         title_display = title or url
+
+        # Termux Native Notification
+        if self.notify_termux:
+            from pydlp.core.termux import send_termux_notification
+            send_termux_notification("Download Failed", f"{title_display[:50]}: {error_msg[:100]}", priority="high")
 
         if self.discord_url:
             embed = {

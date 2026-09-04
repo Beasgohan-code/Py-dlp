@@ -19,23 +19,28 @@ def main(args: Optional[List[str]] = None) -> int:
     """Main CLI entrypoint."""
     parsed, opts = parse_cli_args(args)
 
-    # 1. Run Self-Updater if requested
+    # 1. Setup Termux Environment if requested
+    if opts.get("setup_termux", False):
+        from pydlp.core.termux import setup_termux_environment
+        return setup_termux_environment()
+
+    # 2. Run Self-Updater if requested
     if opts.get("update", False):
         from pydlp.core.updater import SelfUpdater
         return SelfUpdater(color=opts.get("color", True)).update()
 
-    # 2. Generate Shell Completion if requested
+    # 3. Generate Shell Completion if requested
     completion_shell = opts.get("generate_completion")
     if completion_shell:
         from pydlp.core.completion import generate_completion_script
         print(generate_completion_script(completion_shell))
         return 0
 
-    # 3. Run Doctor / System Diagnostics if requested
+    # 4. Run Doctor / System Diagnostics if requested
     if opts.get("doctor", False):
         return run_doctor()
 
-    # 4. Search Sites Catalog if requested
+    # 5. Search Sites Catalog if requested
     search_query = opts.get("search_sites")
     if search_query:
         catalog = get_platform_catalog()

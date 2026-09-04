@@ -1,0 +1,1 @@
+# Py-dlp has ZERO mandatory dependencies. It runs on pure Python 3.8+ standard library!

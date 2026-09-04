@@ -1,0 +1,316 @@
+"""Main Py-dlp engine coordinating extraction, format selection, downloading, and post-processing."""
+
+from __future__ import annotations
+
+import copy
+import json
+import os
+import sys
+from typing import Any, Callable, Dict, List, Optional, Union
+
+from pydlp.core.cache import Cache
+from pydlp.core.cookies import NetscapeCookieJar
+from pydlp.core.exceptions import (
+    CancelRequested,
+    DownloadError,
+    ExtractorError,
+    FormatNotAvailableError,
+    PostProcessingError,
+    PyDLPError,
+    UnsupportedURLError,
+)
+from pydlp.core.format_selector import FormatSelector
+from pydlp.core.http import HttpClient
+from pydlp.core.progress import (
+    ConsoleProgressBar,
+    ProgressHookDispatcher,
+    TerminalColors,
+    colorize,
+    print_format_table,
+)
+from pydlp.core.template import TemplateFormatter
+from pydlp.core.types import DownloadProgress, MediaFormat, MediaInfo
+from pydlp.downloader.direct import get_downloader
+from pydlp.extractor import find_extractor_for_url, list_extractors
+from pydlp.options import DEFAULT_OPTIONS
+from pydlp.postprocessor import (
+    ChapterPostProcessor,
+    FFmpegPostProcessor,
+    MetadataPostProcessor,
+    SubtitlePostProcessor,
+    ThumbnailPostProcessor,
+    has_ffmpeg,
+)
+
+
+class PyDLP:
+    """The central Py-dlp extraction and download orchestrator."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        self.params = dict(DEFAULT_OPTIONS)
+        if params:
+            self.params.update(params)
+
+        # Cookie Jar
+        self.cookie_jar = NetscapeCookieJar()
+        cookiefile = self.params.get("cookiefile")
+        if cookiefile and os.path.isfile(cookiefile):
+            try:
+                self.cookie_jar.load_from_file(cookiefile)
+            except Exception as e:
+                self._report_warning(f"Could not load cookies from {cookiefile}: {e}")
+
+        # HTTP Client
+        self.http = HttpClient(
+            user_agent=self.params.get("user_agent"),
+            timeout=float(self.params.get("timeout", 30.0)),
+            max_retries=int(self.params.get("retries", 3)),
+            proxy=self.params.get("proxy"),
+            verify_ssl=not self.params.get("nocheckcertificate", False),
+            rate_limit_bytes_per_sec=self.params.get("rate_limit_bytes_per_sec"),
+            cookie_jar=self.cookie_jar,
+            headers=self.params.get("headers", {}),
+        )
+
+        # Cache
+        self.cache = Cache(enabled=self.params.get("cachedir") is not False)
+        self.http.cache = self.cache
+
+        # Progress hooks and dispatcher
+        self.progress_dispatcher = ProgressHookDispatcher()
+        if not self.params.get("quiet", False) and not self.params.get("dumpjson", False) and not self.params.get("dumpsinglejson", False):
+            self.progress_dispatcher.add_hook(ConsoleProgressBar(enable_colors=self.params.get("color", True)))
+
+        # Format selector & Template formatter
+        self.format_selector = FormatSelector(self.params.get("format"))
+        self.template_formatter = TemplateFormatter(
+            template=self.params.get("outtmpl", "%(title)s [%(id)s].%(ext)s"),
+            restricted=self.params.get("restrictfilenames", False),
+        )
+
+        # Post-processors
+        self._postprocessors = [
+            SubtitlePostProcessor(self.http, self.params),
+            ThumbnailPostProcessor(self.http, self.params),
+            MetadataPostProcessor(self.params),
+            ChapterPostProcessor(self.params),
+            FFmpegPostProcessor(self.params),
+        ]
+
+    def add_progress_hook(self, hook: Callable[[DownloadProgress], None]) -> None:
+        """Registers a custom progress event listener."""
+        self.progress_dispatcher.add_hook(hook)
+
+    def remove_progress_hook(self, hook: Callable[[DownloadProgress], None]) -> None:
+        """Removes a registered progress event listener."""
+        self.progress_dispatcher.remove_hook(hook)
+
+    def _report_info(self, msg: str) -> None:
+        if (
+            not self.params.get("quiet", False)
+            and not self.params.get("dumpjson", False)
+            and not self.params.get("dump_json", False)
+            and not self.params.get("dumpsinglejson", False)
+            and not self.params.get("dump_single_json", False)
+        ):
+            tag = colorize("[info]", TerminalColors.BRIGHT_BLUE, self.params.get("color", True))
+            print(f"{tag} {msg}")
+
+    def _report_warning(self, msg: str) -> None:
+        if (
+            not self.params.get("no_warnings", False)
+            and not self.params.get("quiet", False)
+            and not self.params.get("dumpjson", False)
+            and not self.params.get("dump_json", False)
+            and not self.params.get("dumpsinglejson", False)
+            and not self.params.get("dump_single_json", False)
+        ):
+            tag = colorize("[warning]", TerminalColors.BRIGHT_YELLOW, self.params.get("color", True))
+            print(f"{tag} {msg}")
+
+    def _report_error(self, msg: str) -> None:
+        tag = colorize("[error]", TerminalColors.RED, self.params.get("color", True))
+        print(f"{tag} {msg}", file=sys.stderr)
+
+    def extract_info(
+        self,
+        url: str,
+        download: bool = True,
+        extra_info: Optional[Dict[str, Any]] = None,
+    ) -> Optional[MediaInfo]:
+        """Extracts media metadata for a URL and optionally executes downloads and post-processing."""
+        extractor = find_extractor_for_url(url, self.http, self.params)
+        self._report_info(f"Extracting URL: {url} using [{extractor.IE_NAME}]")
+
+        try:
+            info = extractor.extract(url)
+        except Exception as e:
+            self._report_error(f"Extraction failed: {e}")
+            raise
+
+        if extra_info:
+            info.extra_info.update(extra_info)
+
+        # Handle Playlist
+        if info.is_playlist():
+            return self._process_playlist(info, download=download)
+
+        # Dump JSON if requested
+        if (
+            self.params.get("dumpjson", False)
+            or self.params.get("dump_json", False)
+            or self.params.get("dumpsinglejson", False)
+            or self.params.get("dump_single_json", False)
+        ):
+            print(json.dumps(info.to_dict(), indent=2, ensure_ascii=False))
+            return info
+
+        # List Formats if requested
+        if self.params.get("listformats", False) or self.params.get("list_formats", False):
+            print_format_table(info, enable_colors=self.params.get("color", True))
+            return info
+
+        if self.params.get("simulate", False) or not download:
+            return info
+
+        # Process and download single video
+        self._process_video_download(info)
+        return info
+
+    def _process_playlist(self, info: MediaInfo, download: bool = True) -> MediaInfo:
+        """Processes and filters playlist entries."""
+        self._report_info(f"Downloading playlist: {info.title} ({len(info.entries or [])} items)")
+
+        if self.params.get("dumpsinglejson", False):
+            print(json.dumps(info.to_dict(), indent=2, ensure_ascii=False))
+            return info
+
+        entries = info.entries or []
+        start_idx = self.params.get("playliststart", 1) - 1
+        end_idx = self.params.get("playlistend")
+
+        filtered_entries = entries[start_idx:end_idx] if end_idx else entries[start_idx:]
+
+        for i, entry in enumerate(filtered_entries, 1):
+            entry_url = entry.webpage_url or entry.url
+            if entry_url:
+                try:
+                    self._report_info(f"[{i}/{len(filtered_entries)}] Downloading {entry.title or entry_url}")
+                    self.extract_info(entry_url, download=download, extra_info={"playlist_index": i})
+                except Exception as e:
+                    self._report_warning(f"Failed to process playlist item {entry.title}: {e}")
+
+        return info
+
+    def _process_video_download(self, info: MediaInfo) -> None:
+        """Selects format, runs download engines, merges audio/video if needed, and applies post-processors."""
+        selected_formats = self.format_selector.select_formats(info)
+        if not selected_formats:
+            raise FormatNotAvailableError(f"No formats available for {info.title}")
+
+        info.requested_formats = selected_formats
+        info.selected_format = selected_formats[0]
+
+        # Determine target file path using template
+        raw_out_path = self.template_formatter.format(info, ext=info.selected_format.ext)
+        paths_prefix = self.params.get("paths")
+        if paths_prefix:
+            raw_out_path = os.path.join(paths_prefix, raw_out_path)
+
+        info.filepath = os.path.abspath(raw_out_path)
+        info.filename = os.path.basename(raw_out_path)
+
+        # Ensure destination directory exists
+        dest_dir = os.path.dirname(info.filepath)
+        if dest_dir:
+            os.makedirs(dest_dir, exist_ok=True)
+
+        downloaded_files: List[str] = []
+
+        # Download selected stream(s)
+        if len(selected_formats) == 1:
+            fmt = selected_formats[0]
+            downloader = get_downloader(fmt, self.http, self.params)
+            for hook in self.progress_dispatcher._hooks:
+                downloader.add_progress_hook(hook)
+
+            self._report_info(f"Downloading format [{fmt.format_id}] to {info.filepath}")
+            downloader.download(info.filepath, info, fmt)
+            downloaded_files.append(info.filepath)
+
+        elif len(selected_formats) >= 2:
+            # Separate video and audio streams to merge
+            video_fmt = selected_formats[0]
+            audio_fmt = selected_formats[1]
+
+            base_stem, ext = os.path.splitext(info.filepath)
+            video_part = f"{base_stem}.f{video_fmt.format_id}.{video_fmt.ext}"
+            audio_part = f"{base_stem}.f{audio_fmt.format_id}.{audio_fmt.ext}"
+
+            # Download Video
+            self._report_info(f"Downloading video stream [{video_fmt.format_id}] to {video_part}")
+            dl_video = get_downloader(video_fmt, self.http, self.params)
+            for hook in self.progress_dispatcher._hooks:
+                dl_video.add_progress_hook(hook)
+            dl_video.download(video_part, info, video_fmt)
+
+            # Download Audio
+            self._report_info(f"Downloading audio stream [{audio_fmt.format_id}] to {audio_part}")
+            dl_audio = get_downloader(audio_fmt, self.http, self.params)
+            for hook in self.progress_dispatcher._hooks:
+                dl_audio.add_progress_hook(hook)
+            dl_audio.download(audio_part, info, audio_fmt)
+
+            # Check for FFmpeg to merge
+            ffmpeg_pp = FFmpegPostProcessor(self.params)
+            if ffmpeg_pp.is_available:
+                self._report_info(f"Merging video and audio into {info.filepath}")
+                ffmpeg_pp.merge_video_audio(video_part, audio_part, info.filepath)
+                if not self.params.get("keep_video", False):
+                    for p in (video_part, audio_part):
+                        if os.path.exists(p):
+                            try:
+                                os.remove(p)
+                            except OSError:
+                                pass
+                downloaded_files.append(info.filepath)
+            else:
+                self._report_warning("FFmpeg not found; leaving video and audio as separate tracks")
+                downloaded_files.extend([video_part, audio_part])
+                info.filepath = video_part
+
+        # Run Post-Processors
+        for pp in self._postprocessors:
+            try:
+                files_to_del, info = pp.run(info)
+                for f_del in files_to_del:
+                    if os.path.exists(f_del):
+                        try:
+                            os.remove(f_del)
+                        except OSError:
+                            pass
+            except Exception as e:
+                self._report_warning(f"Post-processor {pp.__class__.__name__} failed: {e}")
+
+        self._report_info(f"Finished processing: {info.filepath}")
+
+    def download(self, url_list: Union[str, List[str]]) -> int:
+        """Downloads a list of URLs. Returns 0 if all succeeded, 1 if any failed."""
+        if isinstance(url_list, str):
+            url_list = [url_list]
+
+        exit_code = 0
+        for url in url_list:
+            try:
+                self.extract_info(url, download=True)
+            except Exception as e:
+                self._report_error(f"Failed to download {url}: {e}")
+                exit_code = 1
+
+        return exit_code
+
+    def __enter__(self) -> PyDLP:
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        pass

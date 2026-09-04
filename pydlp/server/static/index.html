@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Py-dlp — Ultimate Media Extractor & Downloader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --bg-card: rgba(18, 24, 38, 0.7);
+      --bg-card-hover: rgba(28, 36, 56, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(99, 102, 241, 0.4);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --card-radius: 16px;
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.05) 0px, transparent 50%);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 13, 22, 0.8);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid var(--border-accent);
+      color: #818cf8;
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .hero-section {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .hero-title span {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .url-input-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      display: flex;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .url-input-card:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), var(--shadow);
+    }
+
+    .url-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 16px;
+      padding: 12px 16px;
+      font-family: inherit;
+    }
+
+    .url-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* Result preview card */
+    .media-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .media-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+    }
+
+    .media-details {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .media-title {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .media-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .media-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-row {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .select-format {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-format option {
+      background: #111827;
+      color: var(--text);
+    }
+
+    /* Tasks list */
+    .tasks-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-title {
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+
+    .task-status {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .status-downloading {
+      background: rgba(99, 102, 241, 0.2);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+    }
+
+    .status-finished {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .status-error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--primary-gradient);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .task-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Platforms grid */
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .platform-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .platform-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .platform-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .platform-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      background: rgba(9, 13, 22, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .media-card {
+        grid-template-columns: 1fr;
+      }
+      .url-input-card {
+        flex-direction: column;
+      }
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="#" class="logo-container">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">Py-<span>dlp</span></div>
+      <span class="badge">v2026.09.04</span>
+    </a>
+    <div class="header-links">
+      <a href="https://github.com/Beasgohan-code/Py-dlp" target="_blank" class="btn-secondary">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section">
+      <h1 class="hero-title">Extract & Download Media from <span>Anywhere</span></h1>
+      <p class="hero-desc">The high-performance, modular Python media extraction engine with multi-threaded chunking, HLS/DASH streaming, and format multiplexing.</p>
+    </section>
+
+    <div class="url-input-card">
+      <input type="text" id="urlInput" class="url-input" placeholder="Paste URL from YouTube, TikTok, Twitter/X, Instagram, Vimeo, Reddit, SoundCloud...">
+      <button id="extractBtn" class="btn-primary" onclick="extractUrl()">
+        <span>Extract Info</span>
+      </button>
+    </div>
+
+    <div id="mediaResult" style="display: none;"></div>
+
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('tasks')">Active Downloads (<span id="taskCount">0</span>)</button>
+      <button class="tab-btn" onclick="switchTab('platforms')">Supported Extractors</button>
+    </div>
+
+    <div id="tasksTab">
+      <div id="tasksContainer" class="tasks-container">
+        <div class="empty-state">
+          <div class="empty-icon">📥</div>
+          <p>No active downloads right now. Enter a URL above to start!</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="platformsTab" style="display: none;">
+      <div class="platforms-grid" id="platformsGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Py-dlp &copy; 2026 — Next-Gen Extractor & Downloader Suite. Built with pure Python.
+  </footer>
+
+  <script>
+    let currentMediaInfo = null;
+    let tasks = [];
+
+    async function extractUrl() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url) return;
+
+      const btn = document.getElementById('extractBtn');
+      btn.disabled = true;
+      btn.innerHTML = 'Analyzing...';
+
+      try {
+        const resp = await fetch('/api/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const res = await resp.json();
+        if (!res.success) {
+          alert('Extraction failed: ' + (res.error || 'Unknown error'));
+          return;
+        }
+
+        currentMediaInfo = res.data;
+        renderMediaResult(res.data);
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Extract Info';
+      }
+    }
+
+    function renderMediaResult(info) {
+      const container = document.getElementById('mediaResult');
+      container.style.display = 'block';
+
+      const thumbUrl = info.thumbnail || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop';
+      const durationStr = info.duration ? Math.floor(info.duration / 60) + ':' + String(Math.floor(info.duration % 60)).padStart(2, '0') : 'N/A';
+
+      let formatOptions = '';
+      if (info.formats && info.formats.length > 0) {
+        info.formats.forEach(f => {
+          const res = f.resolution || (f.height ? f.height + 'p' : 'audio only');
+          const tbr = f.tbr ? ` (${f.tbr} kbps)` : '';
+          const ext = f.ext || 'mp4';
+          formatOptions += `<option value="${f.format_id}">[${f.format_id}] ${res} - ${ext}${tbr}</option>`;
+        });
+      }
+
+      container.innerHTML = `
+        <div class="media-card">
+          <img src="${thumbUrl}" alt="Thumbnail" class="media-thumb">
+          <div class="media-details">
+            <h2 class="media-title">${escapeHtml(info.title || 'Untitled Media')}</h2>
+            <div class="media-meta">
+              <span>👤 <strong>${escapeHtml(info.uploader || 'Unknown')}</strong></span>
+              <span>⏱️ <strong>${durationStr}</strong></span>
+              <span>🏷️ <strong>${escapeHtml(info.extractor || 'generic')}</strong></span>
+            </div>
+            <div class="action-row">
+              <select id="formatSelect" class="select-format">
+                <option value="bestvideo+bestaudio/best">⚡ Best Quality (Auto-mux)</option>
+                <option value="bestaudio">🎵 Best Audio Only (MP3/M4A)</option>
+                ${formatOptions}
+              </select>
+              <button class="btn-primary" onclick="startDownload('${escapeHtml(info.webpage_url || info.url)}')">
+                <span>⬇️ Download Now</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function startDownload(url) {
+      const formatSelect = document.getElementById('formatSelect');
+      const format = formatSelect ? formatSelect.value : 'bestvideo+bestaudio/best';
+      const isAudioOnly = format === 'bestaudio';
+
+      try {
+        const resp = await fetch('/api/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: url,
+            format: format,
+            extract_audio: isAudioOnly
+          })
+        });
+        const res = await resp.json();
+        if (res.success) {
+          switchTab('tasks');
+          fetchTasks();
+        } else {
+          alert('Download failed to start: ' + res.error);
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function fetchTasks() {
+      try {
+        const resp = await fetch('/api/tasks');
+        const res = await resp.json();
+        tasks = res.tasks || [];
+        renderTasks();
+      } catch (e) {}
+    }
+
+    function renderTasks() {
+      const container = document.getElementById('tasksContainer');
+      document.getElementById('taskCount').innerText = tasks.length;
+
+      if (!tasks || tasks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📥</div>
+            <p>No active downloads right now. Enter a URL above to start!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = tasks.map(t => {
+        const pct = t.progress ? (t.progress.percentage || 0).toFixed(1) : (t.status === 'finished' ? 100 : 0);
+        const speed = t.progress && t.progress.speed ? (t.progress.speed / (1024*1024)).toFixed(2) + ' MiB/s' : '--';
+        const eta = t.progress && t.progress.eta ? Math.round(t.progress.eta) + 's' : '--';
+        const filename = t.progress && t.progress.filename ? t.progress.filename.split('/').pop() : t.url;
+
+        let statusClass = 'status-downloading';
+        if (t.status === 'finished') statusClass = 'status-finished';
+        if (t.status === 'error') statusClass = 'status-error';
+
+        return `
+          <div class="task-card">
+            <div class="task-header">
+              <span class="task-title">${escapeHtml(t.title || filename)}</span>
+              <span class="task-status ${statusClass}">${t.status}</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: ${pct}%"></div>
+            </div>
+            <div class="task-stats">
+              <span>${pct}% complete</span>
+              <span>Speed: ${speed}</span>
+              <span>ETA: ${eta}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadExtractors() {
+      try {
+        const resp = await fetch('/api/extractors');
+        const res = await resp.json();
+        const grid = document.getElementById('platformsGrid');
+        if (res.extractors) {
+          grid.innerHTML = res.extractors.map(ie => `
+            <div class="platform-card">
+              <div class="platform-name">${escapeHtml(ie.name)}</div>
+              <div class="platform-desc">${escapeHtml(ie.desc || 'Supported')}</div>
+            </div>
+          `).join('');
+        }
+      } catch (e) {}
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (tab === 'tasks') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('tasksTab').style.display = 'block';
+        document.getElementById('platformsTab').style.display = 'none';
+      } else {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('tasksTab').style.display = 'none';
+        document.getElementById('platformsTab').style.display = 'block';
+        loadExtractors();
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Auto poll tasks every 1 second
+    setInterval(fetchTasks, 1000);
+    fetchTasks();
+  </script>
+</body>
+</html>

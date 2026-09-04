@@ -119,6 +119,17 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "export_jellyfin": False,
     "write_nfo": False,
     "tui": False,
+    "get_url": False,
+    "get_title": False,
+    "get_id": False,
+    "get_thumbnail": False,
+    "get_description": False,
+    "get_duration": False,
+    "get_filename": False,
+    "print_tmpl": None,
+    "list_subs": False,
+    "extract_flat": False,
+    "exec_cmd": None,
 }
 
 
@@ -284,6 +295,20 @@ def build_arg_parser() -> argparse.ArgumentParser:
     net_group.add_argument("--add-header", action="append", help="Specify a custom HTTP header (FIELD:VALUE)")
     net_group.add_argument("--cookies", dest="cookiefile", type=str, help="Netscape formatted file to read cookies from")
     net_group.add_argument("--no-check-certificates", dest="nocheckcertificate", action="store_true", help="Suppress HTTPS certificate validation")
+
+    # Query & Metadata Output Options (yt-dlp getter flags)
+    query_group = parser.add_argument_group("Query & Metadata Output Options")
+    query_group.add_argument("-g", "--get-url", action="store_true", help="Simulate, quiet but print direct media URL")
+    query_group.add_argument("-e", "--get-title", action="store_true", help="Simulate, quiet but print video title")
+    query_group.add_argument("--get-id", action="store_true", help="Simulate, quiet but print video ID")
+    query_group.add_argument("--get-thumbnail", action="store_true", help="Simulate, quiet but print thumbnail URL")
+    query_group.add_argument("--get-description", action="store_true", help="Simulate, quiet but print video description")
+    query_group.add_argument("--get-duration", action="store_true", help="Simulate, quiet but print video duration in seconds")
+    query_group.add_argument("--get-filename", action="store_true", help="Simulate, quiet but print target output filename")
+    query_group.add_argument("--print", dest="print_tmpl", type=str, help="Print formatted metadata template string (e.g. '%%(title)s [%%(id)s]')")
+    query_group.add_argument("--list-subs", "--list-subtitles", dest="list_subs", action="store_true", help="List all available subtitles for the video and exit")
+    query_group.add_argument("--flat-playlist", "--extract-flat", dest="extract_flat", action="store_true", help="Do not extract video entries of a playlist, list entries quickly")
+    query_group.add_argument("--exec", dest="exec_cmd", type=str, help="Execute a shell command on the downloaded file (use {} for file path)")
 
     # Advanced Next-Gen, DSP & Media Server Options
     advanced_group = parser.add_argument_group("Next-Gen AI, DSP, Media Server & Terminal Options")

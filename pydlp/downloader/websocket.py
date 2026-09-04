@@ -30,7 +30,12 @@ class WebSocketDownloader(BaseDownloader):
         last_dispatch = time.time()
 
         try:
-            resp = self.http.get_raw(fmt.url, headers=headers)
+            if hasattr(self.http, "get_raw"):
+                resp = self.http.get_raw(fmt.url, headers=headers)
+            elif hasattr(self.http, "request"):
+                resp = self.http.request("GET", fmt.url, headers=headers, stream=True)
+            else:
+                resp = self.http.get(fmt.url, headers=headers)
             with open(part_path, "wb") as f:
                 while True:
                     self.check_canceled()

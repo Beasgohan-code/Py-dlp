@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from pydlp.core.types import MediaInfo
 from pydlp.core.utils import sanitize_filename
@@ -24,15 +24,25 @@ class TemplateFormatter:
 
     def format(
         self,
-        info: Union[MediaInfo, Dict[str, Any]],
-        ext: Optional[str] = None,
+        info: Union[str, MediaInfo, Dict[str, Any]],
+        ext_or_info: Optional[Union[str, MediaInfo, Dict[str, Any]]] = None,
         autonumber: Optional[int] = None,
     ) -> str:
         """Evaluates template against media info dictionary/dataclass."""
-        if isinstance(info, MediaInfo):
-            data = info.to_dict()
+        active_template = self.template
+
+        if isinstance(info, str):
+            active_template = info
+            info_target = ext_or_info or {}
+            ext = None
         else:
-            data = dict(info)
+            info_target = info
+            ext = ext_or_info if isinstance(ext_or_info, str) else None
+
+        if isinstance(info_target, MediaInfo):
+            data = info_target.to_dict()
+        else:
+            data = dict(info_target)
 
         if ext:
             data["ext"] = ext
@@ -77,7 +87,7 @@ class TemplateFormatter:
 
             return formatted_val
 
-        rendered = _TEMPLATE_FIELD_RE.sub(repl, self.template)
+        rendered = _TEMPLATE_FIELD_RE.sub(repl, active_template)
 
         # Split path segments to sanitize directories and filename separately
         parts = rendered.split(os.sep)

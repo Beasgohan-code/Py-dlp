@@ -250,7 +250,56 @@ class PyDLP:
 
         # Handle Playlist
         if info.is_playlist():
+            if self.params.get("extract_flat"):
+                for entry in info.entries or []:
+                    print(f"{entry.id}\t{entry.title}\t{entry.webpage_url or entry.url}")
+                return info
             return self._process_playlist(info, download=download)
+
+        # Handle Getter Query Flags
+        if self.params.get("get_url"):
+            selected = self.format_selector.select_formats(info)
+            stream_url = selected[0].url if selected else info.url
+            print(stream_url)
+            return info
+
+        if self.params.get("get_title"):
+            print(info.title or "")
+            return info
+
+        if self.params.get("get_id"):
+            print(info.id or "")
+            return info
+
+        if self.params.get("get_thumbnail"):
+            print(info.thumbnail or "")
+            return info
+
+        if self.params.get("get_description"):
+            print(info.description or "")
+            return info
+
+        if self.params.get("get_duration"):
+            print(info.duration or 0)
+            return info
+
+        if self.params.get("get_filename"):
+            print(self.template_formatter.format(self.params.get("outtmpl", "%(title)s [%(id)s].%(ext)s"), info))
+            return info
+
+        if self.params.get("print_tmpl"):
+            print(self.template_formatter.format(self.params["print_tmpl"], info))
+            return info
+
+        if self.params.get("list_subs"):
+            if info.subtitles:
+                print(f"[info] Available subtitles for {info.id}:")
+                for lang, sub_list in info.subtitles.items():
+                    exts = ",".join([s.ext for s in sub_list])
+                    print(f"  - {lang} ({exts})")
+            else:
+                print(f"[info] {info.id} has no available subtitles")
+            return info
 
         # Dump JSON if requested
         if (
@@ -283,6 +332,18 @@ class PyDLP:
         self.archive.record(info)
         if self.dedup_manager:
             self.dedup_manager.record_media(info)
+
+        # Execute Post-Download Command if requested (--exec)
+        exec_cmd = self.params.get("exec_cmd")
+        if exec_cmd and info.filepath and os.path.exists(info.filepath):
+            import subprocess
+            cmd_to_run = exec_cmd.replace("{}", info.filepath)
+            self._report_info(f"Executing command: {cmd_to_run}")
+            try:
+                subprocess.run(cmd_to_run, shell=True, check=True)
+            except Exception as e:
+                self._report_warning(f"Exec command failed: {e}")
+
         return info
 
     def _process_playlist(self, info: MediaInfo, download: bool = True) -> MediaInfo:

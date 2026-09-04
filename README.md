@@ -8,7 +8,7 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Standard%20Library)-success.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
-[![Tests](https://img.shields.io/badge/tests-passing%20(58%2F58)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
+[![Tests](https://img.shields.io/badge/tests-passing%20(64%2F64)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 
 *A modular, blazing-fast, and complete media extraction and download engine engineered with zero required external dependencies, rich CLI formatting, adaptive turbo multi-connection chunking, HLS/DASH streaming, SponsorBlock removal, AI transcript summarization, and a built-in modern Web Studio Dashboard.*
 
@@ -18,7 +18,9 @@
 
 ## 🌟 What Sets Py-dlp Apart
 
-- 🎯 **Zero Mandatory Dependencies**: Built 100% on Python's robust standard library (`urllib`, `concurrent.futures`, `http.client`, `json`, `xml`, etc.). No bulky dependencies required.
+- 🎯 **Zero Mandatory Dependencies**: Built 100% on Python's robust standard library (`urllib`, `concurrent.futures`, `http.client`, `json`, `xml`, `zipapp`, etc.). No bulky dependencies required.
+- 🚀 **55+ Native Built-in Extractors**: Comprehensive support covering mainstream video platforms, Anime streaming, Adult video/cam networks, Cyberlockers & cloud storage, Global streaming/Live, and Music platforms.
+- 📦 **Single-Binary Standalone Executable**: Generates zero-dependency standalone Unix/Linux/macOS binaries and cross-platform ZipApps via `python3 bundle.py`.
 - ⚡ **Adaptive Turbo Multi-Connection Downloader (`--turbo`)**:
   - Dynamically profiles latency and throughput across concurrent chunks.
   - Automatically auto-tunes worker threads (from 4 to 32 parallel connections) to maximize bandwidth.
@@ -39,34 +41,74 @@
 
 ---
 
-## 📊 24+ Supported Extractors
+## 📊 55+ Supported Extractors Across Categories
 
-| Extractor | URL Pattern Examples | Key Features |
-| :--- | :--- | :--- |
-| **YouTube** | `youtube.com/watch?v=...`, `youtu.be/...`, `youtube.com/shorts/...` | 4K/1080p60 adaptive streams, audio only, captions, playlists |
-| **YouTube Playlist** | `youtube.com/playlist?list=...` | Batch item enumeration, range filtering (`--playlist-start`) |
-| **YouTube Search** | `ytsearch:query`, `ytsearch5:query` | Direct CLI search and download |
-| **TikTok** | `tiktok.com/@user/video/...`, `tiktok.com/v/...` | No-watermark HD MP4, audio tracks |
-| **Instagram** | `instagram.com/reel/...`, `instagram.com/p/...` | Reels, posts, stories, carousels |
-| **Twitter / X** | `twitter.com/.../status/...`, `x.com/.../status/...` | Adaptive video resolutions, syndication API |
-| **Reddit** | `reddit.com/r/.../comments/...`, `v.redd.it/...` | Native DASH audio + video automatic multiplexing |
-| **Spotify** | `open.spotify.com/track/...`, `/album/...`, `/playlist/...` | Track/playlist metadata & stream resolution |
-| **Vimeo** | `vimeo.com/...`, `player.vimeo.com/video/...` | Progressive MP4, master HLS |
-| **Twitch** | `twitch.tv/videos/...`, `clips.twitch.tv/...` | VODs, Clips, live broadcast manifests |
-| **SoundCloud** | `soundcloud.com/artist/track` | MP3 / Opus audio streams, artwork |
-| **Bilibili** | `bilibili.com/video/BV...` / `av...` | DASH video + audio stream extraction |
-| **Rumble** | `rumble.com/v...` | Rumble video stream extraction |
-| **Pinterest** | `pinterest.com/pin/...` | Pin videos, idea pins |
-| **Threads** | `threads.net/@user/post/...` | Meta Threads videos and posts |
-| **Bluesky** | `bsky.app/profile/.../post/...` | ATProto video embeds and HLS streams |
-| **Streamable** | `streamable.com/...` | High quality clip extraction |
-| **Dailymotion** | `dailymotion.com/video/...` | SD/HD progressive and HLS streams |
-| **Facebook** | `facebook.com/watch/?v=...`, `facebook.com/reel/...` | SD and HD streams |
-| **Bandcamp** | `artist.bandcamp.com/track/...`, `/album/...` | Full quality audio tracks |
-| **Podcast / RSS** | `feeds.podcast.com/rss`, `*.rss`, `*.xml` | Universal podcast RSS audio enclosures & metadata |
-| **Archive.org** | `archive.org/details/...` | Item files catalog, videos, audio |
-| **PeerTube** | `peertube.tv/videos/watch/...` | Federated Fediverse video instances |
-| **Generic** | Any URL | Direct media files, OpenGraph, HTML5 tags, Schema.org |
+### 🎬 Mainstream Video & Social
+- **YouTube** (`youtube.com/watch?v=...`, `youtu.be/...`, `youtube.com/shorts/...`, playlists & search)
+- **TikTok** (`tiktok.com/@user/video/...`, `tiktok.com/v/...`)
+- **Instagram** (`instagram.com/p/...`, `/reel/...`, `/tv/...`)
+- **Twitter / X** (`twitter.com/.../status/...`, `x.com/.../status/...`)
+- **Reddit** (`reddit.com/r/...`, `v.redd.it/...` with native DASH multiplexing)
+- **Vimeo** (`vimeo.com/...`, `player.vimeo.com/video/...`)
+- **Twitch** (`twitch.tv/...`, `clips.twitch.tv/...`)
+- **Dailymotion** (`dailymotion.com/video/...`)
+- **Facebook** (`facebook.com/watch/?v=...`, `facebook.com/reel/...`)
+- **Rumble** (`rumble.com/v...`)
+- **Bilibili** (`bilibili.com/video/BV...` / `av...`)
+- **Pinterest** (`pinterest.com/pin/...`)
+- **Threads** (`threads.net/@user/post/...`)
+- **Bluesky** (`bsky.app/profile/.../post/...`)
+- **Streamable** (`streamable.com/...`)
+- **PeerTube** (`peertube.tv/videos/watch/...`)
+- **Archive.org** (`archive.org/details/...`)
+
+### 🎌 Anime Platforms
+- **AnimePahe** (`animepahe.ru/play/...`, `animepahe.org/play/...`, `animepahe.com/play/...`)
+- **Crunchyroll** (`crunchyroll.com/watch/...`, `crunchyroll.com/series/...`)
+- **Aniwave / 9anime / Zoro / HiAnime** (`aniwave.to/watch/...`, `9anime.to/...`, `hianime.to/...`)
+- **Gogoanime / Anitaku** (`gogoanime3.co/...`, `anitaku.to/...`, `anitaku.pe/...`)
+
+### 🔒 Video Hosts & Cyberlockers
+- **Streamtape** (`streamtape.com/v/...`, `streamtape.net/v/...`, `streamta.pe/v/...`)
+- **Mixdrop** (`mixdrop.co/e/...`, `mixdrop.co/f/...`, `mixdrop.ag/...`)
+- **Doodstream** (`doodstream.com/d/...`, `doodstream.com/e/...`, `dood.so/...`, `dood.pm/...`, `dood.li/...`)
+- **Voe** (`voe.sx/e/...`, `voe.sx/...`, `reputationsickly.com/...`, `20demidistance4.com/...`)
+- **Filemoon** (`filemoon.sx/e/...`, `filemoon.sx/d/...`, `filemoon.to/...`, `vidcloud.co/...`)
+- **StreamSB / SBVideo** (`streamsb.net/e/...`, `sbembed.com/e/...`, `watchsb.com/e/...`, `playersb.com/e/...`)
+- **Google Drive & Dropbox** (`drive.google.com/file/d/...`, `dropbox.com/s/...`)
+
+### 📡 Global Streaming, Live & Enterprise
+- **Kick** (`kick.com/...`, `kick.com/video/...`, `kick.com/clips/...`)
+- **NicoNico Douga** (`nicovideo.jp/watch/sm...`, `sp.nicovideo.jp/...`)
+- **AbemaTV** (`abema.tv/channels/...`, `abema.tv/video/title/...`, `abema.tv/video/episode/...`)
+- **Douyin / Kuaishou / XiaoHongShu** (`douyin.com/video/...`, `iesdouyin.com/share/video/...`, `kuaishou.com/...`, `xiaohongshu.com/...`)
+- **Loom** (`loom.com/share/...`)
+- **Wistia** (`fast.wistia.net/embed/iframe/...`, `wistia.com/...`)
+- **Brightcove** (`players.brightcove.net/...`, `brightcove.com/...`)
+- **JWPlayer** (`content.jwplatform.com/videos/...`, `cdn.jwplayer.com/players/...`)
+- **Nebula & Floatplane** (`nebula.tv/videos/...`, `floatplane.com/post/...`)
+
+### 🎵 Music & Audio Platforms
+- **Spotify** (`open.spotify.com/track/...`, `/album/...`, `/playlist/...`)
+- **SoundCloud** (`soundcloud.com/artist/track`, `/sets/...`)
+- **Deezer** (`deezer.com/track/...`, `deezer.com/album/...`, `deezer.page.link/...`)
+- **Mixcloud** (`mixcloud.com/artist/show-name/`)
+- **Audiomack** (`audiomack.com/artist/song/...`, `audiomack.com/artist/album/...`)
+- **Bandcamp** (`artist.bandcamp.com/track/...`, `/album/...`)
+- **Podcast / RSS** (`feeds.podcast.com/rss`, `*.rss`, `*.xml`)
+
+### 🔞 Adult Platforms & Live Cam Networks
+- **Pornhub** (`pornhub.com/view_video.php?viewkey=...`, `pornhubpremium.com/...`)
+- **XVideos & XNXX** (`xvideos.com/video...`, `xnxx.com/video...`)
+- **SpankBang** (`spankbang.com/.../video/...`)
+- **RedTube & YouPorn** (`redtube.com/...`, `youporn.com/watch/...`)
+- **EPorner** (`eporner.com/video/...`)
+- **Chaturbate & Stripchat** (`chaturbate.com/room/...`, `stripchat.com/...`)
+- **Rule34Video** (`rule34video.party/videos/...`)
+- **HQPorner & BongaCams** (`hqporner.com/hdporn/...`, `bongacams.com/...`)
+
+### 🌐 Universal Fallback
+- **Generic** (Any web page via HTML5 video/audio, OpenGraph meta, HLS `.m3u8`, DASH `.mpd`, schema.org)
 
 ---
 
@@ -76,7 +118,7 @@
 # Basic download
 pydlp "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
-# Turbo multi-connection acceleration
+# Turbo multi-connection acceleration (dynamic speed auto-tuning)
 pydlp --turbo "https://example.com/large_video.mp4"
 
 # Remove sponsors, intros, and outros automatically
@@ -94,8 +136,28 @@ pydlp --ai-summary --auto-chapters "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 # List available formats
 pydlp -F "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
-# Launch the Web Studio Dashboard
+# List all supported extractors
+pydlp --list-extractors
+
+# Launch the Web Studio Dashboard & REST API
 pydlp --serve --port 8000
+```
+
+---
+
+## 📦 Standalone Executable & Distribution
+
+Py-dlp includes a self-contained ZipApp packaging tool that bundles the entire library and CLI into an executable single-file binary with zero dependencies:
+
+```bash
+# Generate standalone executable 'dist/pydlp'
+python3 bundle.py
+
+# Run standalone binary directly anywhere with Python 3:
+./dist/pydlp "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# Build all distribution artifacts (sdist, wheel, standalone binary):
+python3 devscripts/build_dist.py
 ```
 
 ---
@@ -120,6 +182,20 @@ dlp.add_progress_hook(lambda p: print(f"Progress: {p.percentage:.1f}% @ {p.speed
 # Extract and download
 info = dlp.extract_info("https://www.youtube.com/watch?v=dQw4w9WgXcQ", download=True)
 print(f"Downloaded: {info.filepath}")
+```
+
+### ⚡ Asynchronous Python SDK
+
+```python
+import asyncio
+from pydlp import AsyncPyDLP
+
+async def main():
+    async_dlp = AsyncPyDLP({"turbo": True})
+    info = await async_dlp.extract_info("https://soundcloud.com/artist/track", download=True)
+    print("Downloaded async:", info.title)
+
+asyncio.run(main())
 ```
 
 ---
@@ -153,7 +229,7 @@ class MyCustomPlatformIE(InfoExtractor):
 ## 🧪 Running Tests
 
 ```bash
-# Run all 58 comprehensive unit & integration tests
+# Run all 64 comprehensive unit & integration tests
 python3 -m unittest discover -s tests -v
 ```
 

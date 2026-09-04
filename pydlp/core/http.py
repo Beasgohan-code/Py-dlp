@@ -71,13 +71,16 @@ class HttpResponse:
         url: str,
     ):
         self._raw = raw_response
+        self.status = status_code
         self.status_code = status_code
         self.headers = headers
         self.url = url
         self._content: Optional[bytes] = None
 
     def read(self, amt: Optional[int] = None) -> bytes:
-        return self._raw.read(amt)
+        if self._raw is None:
+            return b""
+        return self._raw.read() if amt is None else self._raw.read(amt)
 
     @property
     def content(self) -> bytes:
@@ -189,6 +192,8 @@ class HttpClient:
         params: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
         byte_range: Optional[Tuple[int, Optional[int]]] = None,
+        stream: bool = False,
+        **kwargs: Any,
     ) -> HttpResponse:
         """Executes an HTTP request with automatic retry and backoff."""
         timeout_val = timeout or self.timeout

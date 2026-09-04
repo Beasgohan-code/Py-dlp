@@ -56,6 +56,21 @@ class TestHttpAndUtils(unittest.TestCase):
         self.assertTrue(hasattr(client, "get_raw"))
         self.assertTrue(callable(client.get_raw))
 
+    def test_http_request_stream_arg_and_response_status(self):
+        client = HttpClient()
+        from unittest.mock import MagicMock, patch
+        mock_resp = MagicMock()
+        mock_resp.getcode.return_value = 200
+        mock_resp.headers = {"content-type": "video/mp4"}
+        mock_resp.geturl.return_value = "https://example.com/stream.mp4"
+        mock_resp.read.return_value = b"video data"
+
+        with patch.object(client._opener, "open", return_value=mock_resp):
+            resp = client.request("GET", "https://example.com/stream.mp4", stream=True, custom_flag="test")
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.read(5), b"video data")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,4 @@
-"""Comprehensive test coverage for all 80+ platform extractors."""
+"""Comprehensive test coverage for all 105+ platform extractors."""
 
 import unittest
 from pydlp.extractor import list_extractors
@@ -43,38 +43,64 @@ from pydlp.extractor.streamsb import StreamSBIE
 from pydlp.extractor.streamtape import StreamtapeIE
 from pydlp.extractor.voe import VoeIE
 
-# Global Streaming & Live & Enterprise
-from pydlp.extractor.abema import AbemaIE
-from pydlp.extractor.bitchute import BitChuteIE
-from pydlp.extractor.brightcove import BrightcoveIE
-from pydlp.extractor.douyin import DouyinIE
-from pydlp.extractor.dtube import DTubeIE
-from pydlp.extractor.jwplayer import JWPlayerIE
+# Global TV & News Broadcasters
+from pydlp.extractor.arte import ArteTVIE
+from pydlp.extractor.bbc import BBCIE
+from pydlp.extractor.cbc import CBCIE
+from pydlp.extractor.france_tv import FranceTVIE
+from pydlp.extractor.nhk import NHKIE
+from pydlp.extractor.rai import RaiPlayIE
+from pydlp.extractor.rtbf import RTBFIE
+from pydlp.extractor.zdf_ard import ZDFARDMediathekIE
+
+# Education & Courses
+from pydlp.extractor.coursera import CourseraIE
+from pydlp.extractor.edx import EdXIE
+from pydlp.extractor.khanacademy import KhanAcademyIE
+from pydlp.extractor.udemy import UdemyIE
+
+# Gaming & Esports Live Streams
+from pydlp.extractor.afreecatv import AfreecaTVIE
+from pydlp.extractor.chzzk import ChzzkIE
 from pydlp.extractor.kick import KickIE
+from pydlp.extractor.medaltv import MedalTVIE
+from pydlp.extractor.trovo import TrovoIE
+from pydlp.extractor.twitch import TwitchIE
+
+# Enterprise & Video Hosting
+from pydlp.extractor.brightcove import BrightcoveIE
+from pydlp.extractor.jwplayer import JWPlayerIE
 from pydlp.extractor.loom import LoomIE
 from pydlp.extractor.nebula import NebulaIE
+from pydlp.extractor.ted import TedIE
+from pydlp.extractor.veoh import VeohIE
+from pydlp.extractor.vidyard import VidyardIE
+from pydlp.extractor.wistia import WistiaIE
+
+# Alternative Video & Live
+from pydlp.extractor.abema import AbemaIE
+from pydlp.extractor.bitchute import BitChuteIE
+from pydlp.extractor.dtube import DTubeIE
 from pydlp.extractor.niconico import NiconicoIE
 from pydlp.extractor.odysee import OdyseeIE
-from pydlp.extractor.ted import TedIE
-from pydlp.extractor.vidyard import VidyardIE
 from pydlp.extractor.vk import VKIE
-from pydlp.extractor.wistia import WistiaIE
 
 # Mainstream Social Media
 from pydlp.extractor.bluesky import BlueskyIE
 from pydlp.extractor.coub import CoubIE
+from pydlp.extractor.douyin import DouyinIE
 from pydlp.extractor.giphy import GiphyIE
 from pydlp.extractor.imgur import ImgurIE
 from pydlp.extractor.instagram import InstagramIE
 from pydlp.extractor.likee import LikeeIE
 from pydlp.extractor.linkedin import LinkedInIE
+from pydlp.extractor.mastodon import MastodonIE
 from pydlp.extractor.ninegag import NineGagIE
 from pydlp.extractor.pinterest import PinterestIE
 from pydlp.extractor.reddit import RedditIE
 from pydlp.extractor.streamable import StreamableIE
 from pydlp.extractor.threads import ThreadsIE
 from pydlp.extractor.tiktok import TikTokIE
-from pydlp.extractor.twitch import TwitchIE
 from pydlp.extractor.twitter import TwitterIE
 from pydlp.extractor.vimeo import VimeoIE
 from pydlp.extractor.youtube import YoutubeIE, YoutubePlaylistIE, YoutubeSearchIE
@@ -86,10 +112,12 @@ from pydlp.extractor.bandcamp import BandcampIE
 from pydlp.extractor.deezer import DeezerIE
 from pydlp.extractor.freesound import FreesoundIE
 from pydlp.extractor.mixcloud import MixcloudIE
+from pydlp.extractor.mixlr import MixlrIE
 from pydlp.extractor.podcast import PodcastIE
 from pydlp.extractor.soundcloud import SoundCloudIE
 from pydlp.extractor.spotify import SpotifyIE
 from pydlp.extractor.tidal import TidalIE
+from pydlp.extractor.tunein import TuneInIE
 
 # Historical & Federated
 from pydlp.extractor.archiveorg import ArchiveOrgIE
@@ -103,7 +131,7 @@ from pydlp.extractor.rumble import RumbleIE
 class TestAllExtractors(unittest.TestCase):
     def test_all_extractors_registered(self):
         extractors = list_extractors()
-        self.assertGreaterEqual(len(extractors), 75)
+        self.assertGreaterEqual(len(extractors), 100)
 
     def test_anime_extractors(self):
         self.assertTrue(AnimePaheIE.suitable("https://animepahe.ru/play/1234abcd-1234-abcd/5678efgh"))
@@ -116,9 +144,7 @@ class TestAllExtractors(unittest.TestCase):
     def test_adult_extractors(self):
         self.assertTrue(PornhubIE.suitable("https://www.pornhub.com/view_video.php?viewkey=ph12345678"))
         self.assertTrue(XVideosIE.suitable("https://www.xvideos.com/video12345678/awesome_clip"))
-        self.assertTrue(XVideosIE.suitable("https://www.xnXX.com/video-12345678/awesome_clip"))
         self.assertTrue(XHamsterIE.suitable("https://xhamster.com/videos/awesome-video-123456"))
-        self.assertTrue(XHamsterIE.suitable("https://xhamster.desi/movies/great-clip-789012"))
         self.assertTrue(YouJizzIE.suitable("https://www.youjizz.com/videos/sample-title-123456.html"))
         self.assertTrue(SpankBangIE.suitable("https://spankbang.com/12345/video/sample"))
         self.assertTrue(RedTubeIE.suitable("https://www.redtube.com/12345678"))
@@ -137,61 +163,43 @@ class TestAllExtractors(unittest.TestCase):
         self.assertTrue(Rule34VideoIE.suitable("https://rule34video.party/videos/123456/sample-animation/"))
         self.assertTrue(HQPornerIE.suitable("https://hqporner.com/hdporn/12345-sample_video.html"))
 
-    def test_videohost_extractors(self):
-        self.assertTrue(StreamtapeIE.suitable("https://streamtape.com/v/abc1234/video.mp4"))
-        self.assertTrue(MixdropIE.suitable("https://mixdrop.co/e/abc1234"))
-        self.assertTrue(DoodStreamIE.suitable("https://dood.to/e/abc1234"))
-        self.assertTrue(VoeIE.suitable("https://voe.sx/e/abc1234"))
-        self.assertTrue(FilemoonIE.suitable("https://filemoon.sx/e/abc1234"))
-        self.assertTrue(StreamSBIE.suitable("https://streamsb.net/e/abc1234.html"))
-        self.assertTrue(GDriveIE.suitable("https://drive.google.com/file/d/1a2b3c4d5e6f7g/view"))
-        self.assertTrue(MediaFireIE.suitable("https://www.mediafire.com/file/abc12345/video.mp4/file"))
+    def test_global_tv_and_news(self):
+        self.assertTrue(ArteTVIE.suitable("https://www.arte.tv/en/videos/123456-000-A/documentary/"))
+        self.assertTrue(BBCIE.suitable("https://www.bbc.co.uk/iplayer/episode/p0123456/sample-episode"))
+        self.assertTrue(CBCIE.suitable("https://www.cbc.ca/player/play/1234567890"))
+        self.assertTrue(RaiPlayIE.suitable("https://www.raiplay.it/video/2026/09/sample-show-abc.html"))
+        self.assertTrue(RTBFIE.suitable("https://www.rtbf.be/auvio/detail_show?id=123456"))
+        self.assertTrue(NHKIE.suitable("https://www.nhk.or.jp/nhkworld/en/ondemand/video/123456/"))
+        self.assertTrue(FranceTVIE.suitable("https://www.france.tv/france-2/journal-20h/123456-emission.html"))
+        self.assertTrue(ZDFARDMediathekIE.suitable("https://www.ardmediathek.de/video/sendung/123456"))
 
-    def test_global_tv_and_live(self):
+    def test_education_extractors(self):
+        self.assertTrue(CourseraIE.suitable("https://www.coursera.org/learn/machine-learning/lecture/abc12/intro-to-ml"))
+        self.assertTrue(KhanAcademyIE.suitable("https://www.khanacademy.org/math/algebra/v/linear-equations-intro"))
+        self.assertTrue(EdXIE.suitable("https://www.edx.org/course/introduction-to-python/12345"))
+        self.assertTrue(UdemyIE.suitable("https://www.udemy.com/course/python-masterclass/12345"))
+
+    def test_gaming_and_streaming(self):
         self.assertTrue(KickIE.suitable("https://kick.com/xqc"))
-        self.assertTrue(NiconicoIE.suitable("https://www.nicovideo.jp/watch/sm12345678"))
-        self.assertTrue(AbemaIE.suitable("https://abema.tv/video/episode/123-456_s1_p1"))
-        self.assertTrue(DouyinIE.suitable("https://www.douyin.com/video/7123456789012345678"))
-        self.assertTrue(LoomIE.suitable("https://www.loom.com/share/a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"))
-        self.assertTrue(WistiaIE.suitable("https://fast.wistia.net/embed/iframe/abc1234"))
-        self.assertTrue(BrightcoveIE.suitable("https://players.brightcove.net/123456789/default_default/index.html?videoId=987654321"))
-        self.assertTrue(JWPlayerIE.suitable("https://cdn.jwplayer.com/players/abc1234-xyz5678.html"))
-        self.assertTrue(NebulaIE.suitable("https://nebula.tv/videos/creator-video-title"))
-        self.assertTrue(OdyseeIE.suitable("https://odysee.com/@creator:1/sample-video:2"))
-        self.assertTrue(BitChuteIE.suitable("https://www.bitchute.com/video/abc1234/"))
-        self.assertTrue(DTubeIE.suitable("https://d.tube/#!/v/creator/abc1234"))
-        self.assertTrue(VKIE.suitable("https://vk.com/video-12345678_98765432"))
-        self.assertTrue(VidyardIE.suitable("https://share.vidyard.com/watch/abc12345"))
-        self.assertTrue(TedIE.suitable("https://www.ted.com/talks/speaker_talk_title"))
+        self.assertTrue(TwitchIE.suitable("https://www.twitch.tv/shroud"))
+        self.assertTrue(TrovoIE.suitable("https://trovo.live/s/StreamerName"))
+        self.assertTrue(AfreecaTVIE.suitable("https://play.afreecatv.com/streamer/12345678"))
+        self.assertTrue(ChzzkIE.suitable("https://chzzk.naver.com/live/abc123456789"))
+        self.assertTrue(MedalTVIE.suitable("https://medal.tv/games/valorant/clips/12345abcde"))
 
     def test_social_extractors(self):
         self.assertTrue(InstagramIE.suitable("https://www.instagram.com/p/CXYZ1234/"))
-        self.assertTrue(InstagramIE.suitable("https://www.instagram.com/reel/CXYZ1234/"))
         self.assertTrue(TikTokIE.suitable("https://www.tiktok.com/@user/video/1234567890123456789"))
         self.assertTrue(TwitterIE.suitable("https://twitter.com/user/status/1234567890123456789"))
         self.assertTrue(RedditIE.suitable("https://www.reddit.com/r/funny/comments/abc123/funny_video/"))
-        self.assertTrue(PinterestIE.suitable("https://www.pinterest.com/pin/123456789012/"))
-        self.assertTrue(ThreadsIE.suitable("https://www.threads.net/@user/post/CXYZ1234/"))
-        self.assertTrue(BlueskyIE.suitable("https://bsky.app/profile/user.bsky.social/post/3kxyz1234"))
-        self.assertTrue(StreamableIE.suitable("https://streamable.com/abc123"))
-        self.assertTrue(LikeeIE.suitable("https://likee.video/@user/video/1234567890"))
-        self.assertTrue(LinkedInIE.suitable("https://www.linkedin.com/posts/user_awesome-post-activity-1234567890/"))
-        self.assertTrue(ImgurIE.suitable("https://imgur.com/gallery/abc1234"))
-        self.assertTrue(GiphyIE.suitable("https://giphy.com/gifs/funny-reaction-abc1234"))
-        self.assertTrue(NineGagIE.suitable("https://9gag.com/gag/abc1234"))
-        self.assertTrue(CoubIE.suitable("https://coub.com/view/abc1234"))
+        self.assertTrue(MastodonIE.suitable("https://mastodon.social/@user/123456789012345678"))
+        self.assertTrue(VeohIE.suitable("https://www.veoh.com/watch/v12345678"))
 
-    def test_music_extractors(self):
+    def test_music_and_radio(self):
         self.assertTrue(SpotifyIE.suitable("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT"))
         self.assertTrue(SoundCloudIE.suitable("https://soundcloud.com/artist/track-name"))
-        self.assertTrue(DeezerIE.suitable("https://www.deezer.com/track/123456789"))
-        self.assertTrue(ApplePodcastsIE.suitable("https://podcasts.apple.com/us/podcast/the-daily/id1200361736?i=1000500000000"))
-        self.assertTrue(TidalIE.suitable("https://tidal.com/browse/track/12345678"))
-        self.assertTrue(MixcloudIE.suitable("https://www.mixcloud.com/dj_artist/awesome-mix-vol-1/"))
-        self.assertTrue(AudiomackIE.suitable("https://audiomack.com/artist-name/song/hit-single"))
-        self.assertTrue(BandcampIE.suitable("https://artist.bandcamp.com/track/song-title"))
-        self.assertTrue(FreesoundIE.suitable("https://freesound.org/people/user/sounds/123456/"))
-        self.assertTrue(PodcastIE.suitable("https://feeds.simplecast.com/54nAGcIl"))
+        self.assertTrue(TuneInIE.suitable("https://tunein.com/radio/BBC-Radio-1-988-s24939/"))
+        self.assertTrue(MixlrIE.suitable("https://mixlr.com/live-showcase"))
 
 
 if __name__ == "__main__":

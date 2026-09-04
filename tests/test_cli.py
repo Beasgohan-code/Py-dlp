@@ -27,6 +27,12 @@ class TestCli(unittest.TestCase):
         self.assertIn("Authorization", opts["headers"])
         self.assertEqual(opts["headers"]["Authorization"], "Bearer token123")
 
+    def test_allrounder_downloader_flags(self):
+        parsed, opts = parse_cli_args(["--external-downloader", "aria2c", "--live-record-duration", "120", "-a", "urls.txt"])
+        self.assertEqual(opts["external_downloader"], "aria2c")
+        self.assertEqual(opts["live_record_duration"], 120.0)
+        self.assertEqual(opts["batchfile"], "urls.txt")
+
 
 if __name__ == "__main__":
     unittest.main()

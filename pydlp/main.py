@@ -33,8 +33,24 @@ def main(args: Optional[List[str]] = None) -> int:
         print(format_table(headers, rows))
         return 0
 
-    # 3. Check for input URLs
-    urls = opts.get("urls", [])
+    # 3. Check for input URLs or batch file
+    urls = list(opts.get("urls", []))
+    batch_file = opts.get("batchfile")
+    if batch_file:
+        try:
+            if batch_file == "-":
+                lines = sys.stdin.read().splitlines()
+            else:
+                with open(batch_file, "r", encoding="utf-8") as bf:
+                    lines = bf.read().splitlines()
+            for line in lines:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    urls.append(line)
+        except Exception as e:
+            print(f"[error] Failed to read batch file {batch_file}: {e}", file=sys.stderr)
+            return 1
+
     if not urls:
         parser = build_arg_parser()
         parser.print_help()

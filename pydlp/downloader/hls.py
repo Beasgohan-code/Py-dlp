@@ -228,3 +228,7 @@ class HlsDownloader(BaseDownloader):
             raise
         except Exception as e:
             raise DownloadError(f"HLS download failed: {e}", orig_error=e)
+
+
+# Alias for compatibility
+HLSDownloader = HlsDownloader

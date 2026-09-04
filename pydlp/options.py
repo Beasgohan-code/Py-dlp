@@ -60,6 +60,9 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "auto_chapters": False,
     "download_archive": None,
     "plugin_dir": None,
+    "batchfile": None,
+    "live_record_duration": None,
+    "external_downloader": None,
 }
 
 
@@ -72,6 +75,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument("urls", nargs="*", help="URL(s) or search queries to extract/download")
+    parser.add_argument("-a", "--batch-file", dest="batchfile", type=str, help="File containing URLs to download ('-' for stdin)")
 
     # General options
     gen_group = parser.add_argument_group("General Options")
@@ -101,6 +105,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     # Download Options
     dl_group = parser.add_argument_group("Download Options")
+    dl_group.add_argument("--external-downloader", type=str, help="Use the specified external downloader (aria2c, curl, wget, axel, ffmpeg)")
+    dl_group.add_argument("--live-record-duration", type=float, help="Record live stream for specified duration in seconds and exit")
     dl_group.add_argument("-N", "--concurrent-fragments", type=int, default=1, help="Number of concurrent chunk download threads (default: 1)")
     dl_group.add_argument("--turbo", action="store_true", help="Enable Adaptive Turbo multi-connection download engine")
     dl_group.add_argument("-r", "--limit-rate", type=str, help="Maximum download rate in bytes per second (e.g. 50K or 4.2M)")

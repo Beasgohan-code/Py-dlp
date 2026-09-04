@@ -9,21 +9,27 @@ from pydlp.core.http import HttpClient
 
 # Extractors
 from pydlp.extractor.abema import AbemaIE
+from pydlp.extractor.afreecatv import AfreecaTVIE
 from pydlp.extractor.animepahe import AnimePaheIE
 from pydlp.extractor.aniwave import AniwaveIE
 from pydlp.extractor.applepodcasts import ApplePodcastsIE
 from pydlp.extractor.archiveorg import ArchiveOrgIE
+from pydlp.extractor.arte import ArteTVIE
 from pydlp.extractor.audiomack import AudiomackIE
 from pydlp.extractor.bandcamp import BandcampIE
 from pydlp.extractor.base import InfoExtractor
+from pydlp.extractor.bbc import BBCIE
 from pydlp.extractor.beeg import BeegIE
 from pydlp.extractor.bilibili import BilibiliIE
 from pydlp.extractor.bitchute import BitChuteIE
 from pydlp.extractor.bluesky import BlueskyIE
 from pydlp.extractor.brightcove import BrightcoveIE
 from pydlp.extractor.camsoda import CamSodaIE
+from pydlp.extractor.cbc import CBCIE
 from pydlp.extractor.chaturbate import ChaturbateIE
+from pydlp.extractor.chzzk import ChzzkIE
 from pydlp.extractor.coub import CoubIE
+from pydlp.extractor.coursera import CourseraIE
 from pydlp.extractor.crunchyroll import CrunchyrollIE
 from pydlp.extractor.cumlouder import CumlouderIE
 from pydlp.extractor.dailymotion import DailymotionIE
@@ -31,10 +37,12 @@ from pydlp.extractor.deezer import DeezerIE
 from pydlp.extractor.doodstream import DoodStreamIE
 from pydlp.extractor.douyin import DouyinIE
 from pydlp.extractor.dtube import DTubeIE
+from pydlp.extractor.edx import EdXIE
 from pydlp.extractor.eporner import EpornerIE
 from pydlp.extractor.facebook import FacebookIE
 from pydlp.extractor.fapello import FapelloIE
 from pydlp.extractor.filemoon import FilemoonIE
+from pydlp.extractor.france_tv import FranceTVIE
 from pydlp.extractor.freesound import FreesoundIE
 from pydlp.extractor.gdrive import GDriveIE
 from pydlp.extractor.generic import GenericIE
@@ -46,16 +54,21 @@ from pydlp.extractor.hqporner import HQPornerIE
 from pydlp.extractor.imgur import ImgurIE
 from pydlp.extractor.instagram import InstagramIE
 from pydlp.extractor.jwplayer import JWPlayerIE
+from pydlp.extractor.khanacademy import KhanAcademyIE
 from pydlp.extractor.kick import KickIE
 from pydlp.extractor.likee import LikeeIE
 from pydlp.extractor.linkedin import LinkedInIE
 from pydlp.extractor.loom import LoomIE
 from pydlp.extractor.manyvids import ManyVidsIE
+from pydlp.extractor.mastodon import MastodonIE
+from pydlp.extractor.medaltv import MedalTVIE
 from pydlp.extractor.mediafire import MediaFireIE
 from pydlp.extractor.mixcloud import MixcloudIE
 from pydlp.extractor.mixdrop import MixdropIE
+from pydlp.extractor.mixlr import MixlrIE
 from pydlp.extractor.motherless import MotherlessIE
 from pydlp.extractor.nebula import NebulaIE
+from pydlp.extractor.nhk import NHKIE
 from pydlp.extractor.niconico import NiconicoIE
 from pydlp.extractor.ninegag import NineGagIE
 from pydlp.extractor.odysee import OdyseeIE
@@ -64,8 +77,10 @@ from pydlp.extractor.pinterest import PinterestIE
 from pydlp.extractor.podcast import PodcastIE
 from pydlp.extractor.pornhub import PornhubIE
 from pydlp.extractor.porntrex import PornTrexIE
+from pydlp.extractor.rai import RaiPlayIE
 from pydlp.extractor.reddit import RedditIE
 from pydlp.extractor.redtube import RedTubeIE
+from pydlp.extractor.rtbf import RTBFIE
 from pydlp.extractor.rule34video import Rule34VideoIE
 from pydlp.extractor.rumble import RumbleIE
 from pydlp.extractor.soundcloud import SoundCloudIE
@@ -80,9 +95,13 @@ from pydlp.extractor.thumbzilla import ThumbzillaIE
 from pydlp.extractor.tidal import TidalIE
 from pydlp.extractor.tiktok import TikTokIE
 from pydlp.extractor.tnaflix import TnaFlixIE
+from pydlp.extractor.trovo import TrovoIE
 from pydlp.extractor.tube8 import Tube8IE
+from pydlp.extractor.tunein import TuneInIE
 from pydlp.extractor.twitch import TwitchIE
 from pydlp.extractor.twitter import TwitterIE
+from pydlp.extractor.udemy import UdemyIE
+from pydlp.extractor.veoh import VeohIE
 from pydlp.extractor.vidyard import VidyardIE
 from pydlp.extractor.vimeo import VimeoIE
 from pydlp.extractor.vk import VKIE
@@ -92,13 +111,14 @@ from pydlp.extractor.xhamster import XHamsterIE
 from pydlp.extractor.xvideos import XVideosIE
 from pydlp.extractor.youjizz import YouJizzIE
 from pydlp.extractor.youtube import YoutubeIE, YoutubePlaylistIE, YoutubeSearchIE
+from pydlp.extractor.zdf_ard import ZDFARDMediathekIE
 
 _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
-    # YouTube & Major
+    # YouTube & Search
     YoutubePlaylistIE,
     YoutubeSearchIE,
     YoutubeIE,
-    # Anime
+    # Anime & Animation
     AnimePaheIE,
     CrunchyrollIE,
     AniwaveIE,
@@ -135,29 +155,50 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     StreamSBIE,
     GDriveIE,
     MediaFireIE,
-    # Global Streaming & Live
+    # Global TV & News Broadcasters
+    ArteTVIE,
+    BBCIE,
+    CBCIE,
+    RaiPlayIE,
+    RTBFIE,
+    NHKIE,
+    FranceTVIE,
+    ZDFARDMediathekIE,
+    # Education & Learning
+    CourseraIE,
+    KhanAcademyIE,
+    EdXIE,
+    UdemyIE,
+    # Gaming & Esports Live Streams
     KickIE,
-    NiconicoIE,
-    AbemaIE,
-    DouyinIE,
+    TwitchIE,
+    TrovoIE,
+    AfreecaTVIE,
+    ChzzkIE,
+    MedalTVIE,
+    # Enterprise & Video Hosting
     LoomIE,
     WistiaIE,
     BrightcoveIE,
     JWPlayerIE,
     NebulaIE,
+    VidyardIE,
+    TedIE,
+    VeohIE,
+    # Alternative Video & Decentralized
     OdyseeIE,
     BitChuteIE,
     DTubeIE,
+    NiconicoIE,
+    AbemaIE,
     VKIE,
-    VidyardIE,
-    TedIE,
-    # Mainstream Social Media
+    # Social Media & Short-Form Video
     VimeoIE,
     TikTokIE,
     InstagramIE,
     TwitterIE,
     RedditIE,
-    TwitchIE,
+    DouyinIE,
     PinterestIE,
     ThreadsIE,
     BlueskyIE,
@@ -168,7 +209,8 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     GiphyIE,
     NineGagIE,
     CoubIE,
-    # Music & Audio
+    MastodonIE,
+    # Music, Audio & Podcasts
     SoundCloudIE,
     SpotifyIE,
     DeezerIE,
@@ -178,8 +220,10 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     AudiomackIE,
     BandcampIE,
     FreesoundIE,
+    TuneInIE,
+    MixlrIE,
     PodcastIE,
-    # Federated & Historical
+    # Historical & Federated
     BilibiliIE,
     RumbleIE,
     DailymotionIE,

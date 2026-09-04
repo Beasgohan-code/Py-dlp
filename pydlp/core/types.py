@@ -39,10 +39,14 @@ class MediaChapter:
     """Represents a video/audio chapter marker."""
     title: str
     start_time: float
-    end_time: float
+    end_time: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+# Compatibility alias
+Chapter = MediaChapter
 
 
 @dataclass

@@ -33,8 +33,8 @@ class InfoExtractor:
     _VALID_URL: str = r""
     SEARCH_KEY: Optional[str] = None
 
-    def __init__(self, http_client: HttpClient, options: Optional[Dict[str, Any]] = None):
-        self.http = http_client
+    def __init__(self, http_client: Optional[HttpClient] = None, options: Optional[Dict[str, Any]] = None):
+        self.http = http_client or HttpClient()
         self.options = options or {}
         self._cache = getattr(self.http, "cache", None)
 

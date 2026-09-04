@@ -69,7 +69,12 @@ class ResumableDownloader(BaseDownloader):
                 if downloaded_bytes > 0:
                     headers["Range"] = f"bytes={downloaded_bytes}-"
 
-                resp = self.http.get_raw(fmt.url, headers=headers)
+                if hasattr(self.http, "get_raw"):
+                    resp = self.http.get_raw(fmt.url, headers=headers)
+                elif hasattr(self.http, "request"):
+                    resp = self.http.request("GET", fmt.url, headers=headers, stream=True)
+                else:
+                    resp = self.http.get(fmt.url, headers=headers)
                 status = getattr(resp, "status", getattr(resp, "status_code", 200))
 
                 content_range = resp.headers.get("Content-Range", "")

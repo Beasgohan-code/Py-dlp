@@ -19,12 +19,17 @@ def main(args: Optional[List[str]] = None) -> int:
     """Main CLI entrypoint."""
     parsed, opts = parse_cli_args(args)
 
-    # 1. Setup Termux Environment if requested
+    # 1. Launch TUI Dashboard if requested
+    if opts.get("tui", False):
+        from pydlp.core.tui import launch_tui
+        return launch_tui()
+
+    # 2. Setup Termux Environment if requested
     if opts.get("setup_termux", False):
         from pydlp.core.termux import setup_termux_environment
         return setup_termux_environment()
 
-    # 2. Run Self-Updater if requested
+    # 3. Run Self-Updater if requested
     if opts.get("update", False):
         from pydlp.core.updater import SelfUpdater
         return SelfUpdater(color=opts.get("color", True)).update()

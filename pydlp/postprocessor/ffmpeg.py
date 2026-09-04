@@ -12,15 +12,21 @@ from pydlp.core.types import MediaInfo
 from pydlp.postprocessor.base import BasePostProcessor
 
 
-def has_ffmpeg(ffmpeg_path: Optional[str] = None) -> bool:
+def has_ffmpeg(ffmpeg_path: Optional[str | Dict[str, Any]] = None) -> bool:
     """Checks whether ffmpeg executable is installed and available."""
-    bin_name = ffmpeg_path or "ffmpeg"
+    if isinstance(ffmpeg_path, dict):
+        bin_name = ffmpeg_path.get("ffmpeg_location") or "ffmpeg"
+    else:
+        bin_name = ffmpeg_path or "ffmpeg"
     return shutil.which(bin_name) is not None
 
 
-def get_ffmpeg_path(ffmpeg_location: Optional[str] = None) -> Optional[str]:
+def get_ffmpeg_path(ffmpeg_location: Optional[str | Dict[str, Any]] = None) -> Optional[str]:
     """Returns resolved path to ffmpeg binary or None if not found."""
-    bin_name = ffmpeg_location or "ffmpeg"
+    if isinstance(ffmpeg_location, dict):
+        bin_name = ffmpeg_location.get("ffmpeg_location") or "ffmpeg"
+    else:
+        bin_name = ffmpeg_location or "ffmpeg"
     return shutil.which(bin_name)
 
 

@@ -109,6 +109,16 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "embed_subs": False,
     "embed_chapters": False,
     "generate_completion": None,
+    "preview": False,
+    "dedup_fuzzy": False,
+    "split_audio_stems": False,
+    "auto_highlights": False,
+    "highlight_duration": 60.0,
+    "vertical_crop": False,
+    "export_plex": False,
+    "export_jellyfin": False,
+    "write_nfo": False,
+    "tui": False,
 }
 
 
@@ -274,6 +284,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
     net_group.add_argument("--add-header", action="append", help="Specify a custom HTTP header (FIELD:VALUE)")
     net_group.add_argument("--cookies", dest="cookiefile", type=str, help="Netscape formatted file to read cookies from")
     net_group.add_argument("--no-check-certificates", dest="nocheckcertificate", action="store_true", help="Suppress HTTPS certificate validation")
+
+    # Advanced Next-Gen, DSP & Media Server Options
+    advanced_group = parser.add_argument_group("Next-Gen AI, DSP, Media Server & Terminal Options")
+    advanced_group.add_argument("--preview", action="store_true", help="Render ANSI TrueColor half-block ASCII preview in terminal")
+    advanced_group.add_argument("--dedup-fuzzy", "--fuzzy-dedup", dest="dedup_fuzzy", action="store_true", help="Enable intelligent multi-factor title & duration duplicate detection")
+    advanced_group.add_argument("--split-audio-stems", "--extract-stems", dest="split_audio_stems", action="store_true", help="Split audio into separate Vocals, Instrumentals, Bass, and Treble tracks")
+    advanced_group.add_argument("--auto-highlights", action="store_true", help="Automatically generate short highlight reel / summary clips")
+    advanced_group.add_argument("--highlight-duration", type=float, default=60.0, help="Target duration in seconds for highlight reel (default: 60)")
+    advanced_group.add_argument("--vertical-crop", action="store_true", help="Crop video to 9:16 vertical aspect ratio for TikTok/Shorts")
+    advanced_group.add_argument("--export-plex", action="store_true", help="Generate Plex-compatible .nfo metadata and fanart/posters")
+    advanced_group.add_argument("--export-jellyfin", action="store_true", help="Generate Jellyfin/Emby/Kodi .nfo metadata and fanart/posters")
+    advanced_group.add_argument("--write-nfo", action="store_true", help="Write movie/episode .nfo metadata XML file")
+    advanced_group.add_argument("--tui", action="store_true", help="Launch live fullscreen curses Terminal Dashboard")
 
     return parser
 

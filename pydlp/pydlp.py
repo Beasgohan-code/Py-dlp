@@ -20,6 +20,8 @@ from pydlp.core.exceptions import (
     PyDLPError,
     UnsupportedURLError,
 )
+from pydlp.core.ascii_preview import TerminalMediaPreview
+from pydlp.core.dedup import FuzzyDedupManager
 from pydlp.core.format_selector import FormatSelector
 from pydlp.core.http import HttpClient
 from pydlp.core.interactive import InteractiveSelector
@@ -44,11 +46,14 @@ from pydlp.postprocessor import (
     AISummaryPostProcessor,
     AudioDSPPostProcessor,
     AudioNormalizerPostProcessor,
+    AudioStemSeparatorPostProcessor,
     ChapterPostProcessor,
     CloudUploaderPostProcessor,
     FFmpegPostProcessor,
+    HighlightReelPostProcessor,
     MediaEmbedderPostProcessor,
     MediaEnhancerPostProcessor,
+    MediaServerNfoPostProcessor,
     MetadataPostProcessor,
     SponsorBlockPostProcessor,
     SubtitlePostProcessor,
@@ -139,6 +144,11 @@ class PyDLP:
             datebefore=self.params.get("datebefore"),
         )
 
+        # Smart Fuzzy Deduplicator
+        self.dedup_manager = (
+            FuzzyDedupManager() if self.params.get("dedup_fuzzy") else None
+        )
+
         # Built-in and custom post-processors
         self._postprocessors = [
             SubtitlePostProcessor(self.http, self.params),
@@ -149,11 +159,14 @@ class PyDLP:
             TimeRangeCutterPostProcessor(self.params),
             AudioNormalizerPostProcessor(self.params),
             AudioDSPPostProcessor(self.params),
+            AudioStemSeparatorPostProcessor(self.params),
+            HighlightReelPostProcessor(self.params),
             MediaEnhancerPostProcessor(self.params),
             AISummaryPostProcessor(self.http, self.params),
             ChapterPostProcessor(self.params),
             FFmpegPostProcessor(self.params),
             MediaEmbedderPostProcessor(self.params),
+            MediaServerNfoPostProcessor(self.http, self.params),
             CloudUploaderPostProcessor(self.params),
         ]
         # Append registered custom post-processors
@@ -219,6 +232,21 @@ class PyDLP:
             self._report_info(f"[{info.id}] has already been recorded in archive; skipping download")
             return info
 
+        # Check Smart Fuzzy Deduplicator
+        if self.dedup_manager:
+            is_dup, dup_reason = self.dedup_manager.is_duplicate(info)
+            if is_dup:
+                self._report_info(f"[{info.id}] Skipping download: {dup_reason}")
+                return info
+
+        # Terminal ASCII TrueColor Preview
+        if self.params.get("preview") and info.title:
+            preview_str = TerminalMediaPreview.render_thumbnail_url_or_file(
+                info.thumbnail or info.webpage_url or "", info.title
+            )
+            if preview_str:
+                print(f"\n{preview_str}\n")
+
         # Handle Playlist
         if info.is_playlist():
             return self._process_playlist(info, download=download)
@@ -250,8 +278,10 @@ class PyDLP:
         # Process and download single video
         self._process_video_download(info)
 
-        # Record in archive
+        # Record in archive & dedup index
         self.archive.record(info)
+        if self.dedup_manager:
+            self.dedup_manager.record_media(info)
         return info
 
     def _process_playlist(self, info: MediaInfo, download: bool = True) -> MediaInfo:

@@ -9,13 +9,30 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Standard%20Library)-success.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
-[![Tests](https://img.shields.io/badge/tests-passing%20(113%2F113)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
+[![Tests](https://img.shields.io/badge/tests-passing%20(118%2F118)-emerald.svg?style=for-the-badge)](https://github.com/Beasgohan-code/Py-dlp)
 
 *A modular, blazing-fast, and complete media extraction and download engine engineered with zero required external dependencies, rich CLI formatting, Universal All-Rounder Downloader dispatch, HLS/DASH streaming, continuous live recording, SponsorBlock removal, AI transcript summarization, and a built-in modern Web Studio Dashboard.*
 
 ---
 
 </div>
+
+## 🌟 Next-Gen Superior Features (Why Py-dlp is Better Than yt-dlp)
+
+| Next-Gen Feature | Py-dlp | yt-dlp | Description |
+| :--- | :---: | :---: | :--- |
+| **🎨 24-Bit TrueColor Terminal Preview** |  **YES (`--preview`)** |  No | Renders video frames & thumbnails directly in your terminal using ANSI half-blocks. |
+| **🧠 Fuzzy Deduplication Index** |  **YES (`--dedup-fuzzy`)** |  No | Detects mirrors, re-uploads, and title variations to stop downloading duplicate videos. |
+| **🎵 Multi-Track Audio Stem Separator** |  **YES (`--split-audio-stems`)** |  No | Splits audio into isolated Vocals, Instrumentals, Bass, and Percussion tracks. |
+| **✂️ Auto Highlights & 9:16 Shorts** |  **YES (`--auto-highlights`)** |  No | Cuts top engaging video moments and exports a 60s vertical TikTok/Shorts clip. |
+| **🎬 Jellyfin / Plex / Kodi NFO Exporter** |  **YES (`--export-plex`)** |  No | Generates `.nfo` XML metadata, `poster.jpg`, and `fanart.jpg` for instant media server scraping. |
+| **🖥️ Live Interactive Curses Dashboard** |  **YES (`--tui`)** |  No | Fullscreen terminal TUI with multi-task visual download bars and real-time logs. |
+| **📱 Native Android Termux Share Sheet** |  **YES (`--setup-termux`)** |  No | Tap "Share" in YouTube/TikTok/Instagram on Android and choose Termux to download! |
+| **🌐 7,500+ Universal Domain Index** |  **YES (7,512+)** |  Partial | Built-in Universal Engine extracting metadata from JSON-LD, OpenGraph, and manifests. |
+| **⚡ Turbo Multi-Thread Adaptive Engine** |  **YES (`--turbo`)** |  Partial | Auto-tunes 4 to 32 parallel chunk streams based on live network latency profiling. |
+| **🛡️ Built-in SponsorBlock Slicing** |  **YES** |  Requires plugin | Losslessly cuts sponsored ads, intros, and self-promos without re-encoding. |
+| **🎤 AI Whisper Transcription** |  **YES (`--ai-transcribe`)** |  No | Auto-generates local subtitles using Whisper AI when none exist on the site. |
+| **☁️ Cloud Auto-Upload (S3/WebDAV/FTP)** |  **YES** |  No | Uploads finished downloads directly to AWS S3, Cloudflare R2, Nextcloud, or FTP. |
 
 ## 📥 Installation
 

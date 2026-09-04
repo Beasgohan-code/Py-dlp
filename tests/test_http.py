@@ -51,6 +51,11 @@ class TestHttpAndUtils(unittest.TestCase):
         self.assertEqual(parse_filesize("10MiB"), 10485760)
         self.assertEqual(parse_filesize("1GiB"), 1073741824)
 
+    def test_http_get_raw_attribute(self):
+        client = HttpClient()
+        self.assertTrue(hasattr(client, "get_raw"))
+        self.assertTrue(callable(client.get_raw))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -260,6 +260,10 @@ class HttpClient:
     def get(self, url: str, **kwargs: Any) -> HttpResponse:
         return self.request("GET", url, **kwargs)
 
+    def get_raw(self, url: str, **kwargs: Any) -> HttpResponse:
+        """Returns raw HttpResponse stream for chunked reading."""
+        return self.request("GET", url, stream=True, **kwargs)
+
     def post(self, url: str, **kwargs: Any) -> HttpResponse:
         return self.request("POST", url, **kwargs)
 

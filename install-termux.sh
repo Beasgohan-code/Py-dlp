@@ -7,11 +7,11 @@ set -e
 echo "📱 Installing Py-dlp Studio for Termux (Android)..."
 
 # 1. Update pkg & install Python, FFmpeg, git, curl
-echo "✓ Updating package repositories..."
-pkg update -y || apt-get update -y
+echo "✓ Updating and upgrading package repositories..."
+pkg update -y && pkg upgrade -y || apt-get update -y && apt-get upgrade -y
 
 echo "✓ Installing Python 3, FFmpeg, and required tools..."
-pkg install -y python ffmpeg curl git termux-api || apt-get install -y python ffmpeg curl git
+pkg install -y python ffmpeg libx265 curl git termux-api || apt-get install -y python ffmpeg curl git
 
 # 2. Install Py-dlp from GitHub repository
 echo "✓ Installing Py-dlp..."

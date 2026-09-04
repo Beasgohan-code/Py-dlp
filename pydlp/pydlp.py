@@ -347,6 +347,14 @@ class PyDLP:
         # Notify download start
         self.notifier.notify_download_start(info)
 
+        # Simplify selected formats if both video and audio already exist in a single stream
+        if len(selected_formats) >= 2:
+            if (
+                selected_formats[0].format_id == selected_formats[1].format_id
+                or (selected_formats[0].has_video and selected_formats[0].has_audio)
+            ):
+                selected_formats = [selected_formats[0]]
+
         # Download selected stream(s)
         if len(selected_formats) == 1:
             fmt = selected_formats[0]
@@ -384,16 +392,21 @@ class PyDLP:
             # Check for FFmpeg to merge
             ffmpeg_pp = FFmpegPostProcessor(self.params)
             if ffmpeg_pp.is_available:
-                self._report_info(f"Merging video and audio into {info.filepath}")
-                ffmpeg_pp.merge_video_audio(video_part, audio_part, info.filepath)
-                if not self.params.get("keep_video", False):
-                    for p in (video_part, audio_part):
-                        if os.path.exists(p):
-                            try:
-                                os.remove(p)
-                            except OSError:
-                                pass
-                downloaded_files.append(info.filepath)
+                try:
+                    self._report_info(f"Merging video and audio into {info.filepath}")
+                    ffmpeg_pp.merge_video_audio(video_part, audio_part, info.filepath)
+                    if not self.params.get("keep_video", False):
+                        for p in (video_part, audio_part):
+                            if os.path.exists(p):
+                                try:
+                                    os.remove(p)
+                                except OSError:
+                                    pass
+                    downloaded_files.append(info.filepath)
+                except Exception as e:
+                    self._report_warning(f"FFmpeg merging encountered an issue ({e}); preserving video and audio files.")
+                    downloaded_files.extend([video_part, audio_part])
+                    info.filepath = video_part
             else:
                 self._report_warning("FFmpeg not found; leaving video and audio as separate tracks")
                 downloaded_files.extend([video_part, audio_part])

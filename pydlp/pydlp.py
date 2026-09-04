@@ -39,9 +39,12 @@ from pydlp.downloader.direct import get_downloader
 from pydlp.extractor import find_extractor_for_url, list_extractors
 from pydlp.options import DEFAULT_OPTIONS
 from pydlp.postprocessor import (
+    AISubtitleGeneratorPostProcessor,
     AISummaryPostProcessor,
+    AudioDSPPostProcessor,
     AudioNormalizerPostProcessor,
     ChapterPostProcessor,
+    CloudUploaderPostProcessor,
     FFmpegPostProcessor,
     MediaEnhancerPostProcessor,
     MetadataPostProcessor,
@@ -128,15 +131,18 @@ class PyDLP:
         # Built-in and custom post-processors
         self._postprocessors = [
             SubtitlePostProcessor(self.http, self.params),
+            AISubtitleGeneratorPostProcessor(self.params),
             ThumbnailPostProcessor(self.http, self.params),
             MetadataPostProcessor(self.params),
             SponsorBlockPostProcessor(self.http, self.params),
             TimeRangeCutterPostProcessor(self.params),
             AudioNormalizerPostProcessor(self.params),
+            AudioDSPPostProcessor(self.params),
             MediaEnhancerPostProcessor(self.params),
             AISummaryPostProcessor(self.http, self.params),
             ChapterPostProcessor(self.params),
             FFmpegPostProcessor(self.params),
+            CloudUploaderPostProcessor(self.params),
         ]
         # Append registered custom post-processors
         for custom_pp_cls in get_custom_postprocessors():

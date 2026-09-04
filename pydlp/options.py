@@ -87,6 +87,15 @@ DEFAULT_OPTIONS: Dict[str, Any] = {
     "video_denoise": False,
     "reencode_codec": None,
     "hardware_accel": None,
+    "upload_s3": None,
+    "upload_webdav": None,
+    "upload_ftp": None,
+    "vocal_removal": False,
+    "audio_bass_boost": None,
+    "audio_reverb": False,
+    "ai_transcribe": False,
+    "ai_transcribe_model": "base",
+    "swarm_nodes": None,
 }
 
 
@@ -170,20 +179,25 @@ def build_arg_parser() -> argparse.ArgumentParser:
     thumb_group.add_argument("--write-all-thumbnails", action="store_true", help="Write all thumbnail image formats to disk")
 
     # Subtitle Options
-    sub_group = parser.add_argument_group("Subtitle Options")
+    sub_group = parser.add_argument_group("Subtitle & AI Transcription Options")
     sub_group.add_argument("--write-sub", "--write-subs", dest="writesubtitles", action="store_true", help="Write subtitle file")
     sub_group.add_argument("--write-auto-sub", "--write-auto-subs", dest="writeautomaticsub", action="store_true", help="Write automatically generated subtitle file")
+    sub_group.add_argument("--ai-transcribe", action="store_true", help="Generate local AI subtitle transcriptions using Whisper speech models")
+    sub_group.add_argument("--ai-transcribe-model", type=str, default="base", help="Whisper transcription model size: tiny, base, small, medium, large (default: base)")
     sub_group.add_argument("--sub-lang", "--sub-langs", dest="subtitleslangs", type=str, default="en", help="Languages of the subtitles to download (comma-separated, default: en)")
     sub_group.add_argument("--sub-format", dest="subtitlesformat", type=str, default="srt", help="Subtitle format, accepts srt/vtt/ass (default: srt)")
 
     # Post-processing Options
-    pp_group = parser.add_argument_group("Post-processing & Filter Options")
+    pp_group = parser.add_argument_group("Post-processing, DSP & Filter Options")
     pp_group.add_argument("-x", "--extract-audio", action="store_true", help="Convert video files to audio-only files")
     pp_group.add_argument("--audio-format", type=str, default="mp3", help="Specify audio format: 'mp3', 'aac', 'm4a', 'opus', 'flac', or 'wav' (default: mp3)")
     pp_group.add_argument("--audio-quality", type=str, default="192k", help="Specify ffmpeg audio quality (default: 192k)")
     pp_group.add_argument("--audio-loudnorm", action="store_true", help="Apply EBU R128 loudness normalization")
     pp_group.add_argument("--audio-pitch", type=float, help="Adjust audio pitch multiplier (e.g. 1.2 or 0.85)")
     pp_group.add_argument("--audio-tempo", type=float, help="Adjust audio playback tempo/speed without changing pitch (e.g. 1.25)")
+    pp_group.add_argument("--vocal-removal", action="store_true", help="Apply center vocal removal filter for karaoke/instrumentals")
+    pp_group.add_argument("--audio-bass-boost", type=float, help="Apply bass boost filter with gain in dB (e.g. 8.0)")
+    pp_group.add_argument("--audio-reverb", action="store_true", help="Apply stereo audio reverberation effect")
     pp_group.add_argument("--video-speed", type=float, help="Adjust video speed multiplier (e.g. 1.5 or 0.75)")
     pp_group.add_argument("--video-denoise", action="store_true", help="Apply high-quality 3D video denoising filter")
     pp_group.add_argument("--reencode-codec", type=str, help="Re-encode output with codec (e.g. h264, hevc, av1, vp9, mp3, flac)")
@@ -192,6 +206,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
     pp_group.add_argument("--write-info-json", action="store_true", help="Write video metadata to a .info.json file")
     pp_group.add_argument("--write-chapters", action="store_true", help="Export video chapters to a JSON file")
     pp_group.add_argument("--ffmpeg-location", type=str, help="Path to the ffmpeg binary")
+
+    # Cloud & Remote Upload Options
+    cloud_group = parser.add_argument_group("Cloud & Remote Storage Upload Options")
+    cloud_group.add_argument("--upload-s3", type=str, help="Auto-upload completed download to S3/R2 REST PUT endpoint or bucket URL")
+    cloud_group.add_argument("--upload-webdav", type=str, help="Auto-upload completed download to Nextcloud/WebDAV URL")
+    cloud_group.add_argument("--upload-ftp", type=str, help="Auto-upload completed download to FTP URL (ftp://user:pass@host/path)")
+
+    # Distributed Cluster Swarm
+    swarm_group = parser.add_argument_group("Distributed Cluster Swarm Options")
+    swarm_group.add_argument("--swarm-nodes", type=str, help="Comma-separated list of remote Py-dlp worker nodes for distributed chunk swarm")
 
     # Format Options
     fmt_group = parser.add_argument_group("Format Selection Options")

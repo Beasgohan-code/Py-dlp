@@ -114,6 +114,63 @@ from pydlp.extractor.youjizz import YouJizzIE
 from pydlp.extractor.youtube import YoutubeIE, YoutubePlaylistIE, YoutubeSearchIE
 from pydlp.extractor.zdf_ard import ZDFARDMediathekIE
 
+# Extended Extractors
+from pydlp.extractor.ott_asian import (
+    BilibiliTVIE,
+    HotstarIE,
+    IQIYIIE,
+    JioCinemaIE,
+    SonyLivIE,
+    VootIE,
+    WeTVIE,
+    Zee5IE,
+)
+from pydlp.extractor.fast_tv import (
+    PlexIE,
+    PlutoTVIE,
+    RakutenTVIE,
+    RokuIE,
+    TubiTVIE,
+)
+from pydlp.extractor.doujin_manga import (
+    AsmHentaiIE,
+    EHentaiIE,
+    FakkuIE,
+    HitomiIE,
+    MangaDexIE,
+    NHentaiIE,
+    PururinIE,
+    TsuminoIE,
+)
+from pydlp.extractor.booru_art import (
+    ArtStationIE,
+    CoomerIE,
+    DanbooruIE,
+    DeviantArtIE,
+    GelbooruIE,
+    KemonoIE,
+    PixivIE,
+)
+from pydlp.extractor.cams_premium import (
+    BongacamsIE,
+    Cam4IE,
+    FanslyDemoIE,
+    LiveJasminIE,
+    MyFreeCamsIE,
+    OnlyFansDemoIE,
+    StripchatIE,
+)
+from pydlp.extractor.podcasts_extra import (
+    AnchorFmIE,
+    BuzzsproutIE,
+    CastboxIE,
+    MediumIE,
+    PodbeanIE,
+    RedCircleIE,
+    SpreakerIE,
+    SubstackIE,
+)
+
 _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     # YouTube & Search
     YoutubePlaylistIE,
@@ -232,6 +289,55 @@ _BUILTIN_EXTRACTORS: List[Type[InfoExtractor]] = [
     ArchiveOrgIE,
     PeerTubeIE,
     TorrentExtractor,
+    # Asian & Indian OTT
+    JioCinemaIE,
+    HotstarIE,
+    SonyLivIE,
+    Zee5IE,
+    VootIE,
+    IQIYIIE,
+    WeTVIE,
+    BilibiliTVIE,
+    # Free FAST TV
+    TubiTVIE,
+    PlutoTVIE,
+    PlexIE,
+    RokuIE,
+    RakutenTVIE,
+    # Manga & Doujinshi
+    NHentaiIE,
+    HitomiIE,
+    EHentaiIE,
+    TsuminoIE,
+    MangaDexIE,
+    AsmHentaiIE,
+    PururinIE,
+    FakkuIE,
+    # Artboards & Boorus
+    DanbooruIE,
+    GelbooruIE,
+    PixivIE,
+    KemonoIE,
+    CoomerIE,
+    DeviantArtIE,
+    ArtStationIE,
+    # Live Cams & Creator Feeds
+    StripchatIE,
+    BongacamsIE,
+    Cam4IE,
+    MyFreeCamsIE,
+    LiveJasminIE,
+    OnlyFansDemoIE,
+    FanslyDemoIE,
+    # Extended Podcasts & Blogs
+    SubstackIE,
+    MediumIE,
+    AnchorFmIE,
+    SpreakerIE,
+    PodbeanIE,
+    CastboxIE,
+    RedCircleIE,
+    BuzzsproutIE,
     GenericIE,  # Must be last as fallback
 ]
 
